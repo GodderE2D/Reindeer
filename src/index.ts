@@ -12,6 +12,7 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import { Collection, Snowflake, version } from "discord.js";
 import { Partials } from "discord.js";
 import Fastify from "fastify";
+import { AutoPoster } from "topgg-autoposter";
 
 import { intents } from "./constants/intents.js";
 import { makeCache } from "./constants/makeCache.js";
@@ -53,6 +54,12 @@ export const client = new SapphireClient({
 
 client.login(env.DISCORD_TOKEN);
 
+// Top.gg statistics
+if (env.NODE_ENV === "production" && env.TOPGG_TOKEN?.length) {
+  const poster = AutoPoster(env.TOPGG_TOKEN, client);
+  poster.on("error", (error) => logger.error("Top.gg AutoPoster received an error:", error));
+}
+
 // Create collections
 export const commandsRan = new Collection<Snowflake, { createdAt: Date; name: string }>();
 
@@ -61,27 +68,29 @@ process.on("unhandledRejection", (err) => logger.error("Encountered an unhandled
 process.on("uncaughtException", (err) => logger.error("Encountered an uncaught exception:", err));
 
 // Fastify client
-const fastify = Fastify();
+if (env.API_KEY?.length) {
+  const fastify = Fastify();
 
-await fastify.register(cors, {
-  origin: "*",
-});
+  await fastify.register(cors, {
+    origin: "*",
+  });
 
-await fastify.register(helmet);
+  await fastify.register(helmet);
 
-for (const plugin of Object.values(routes)) {
-  await fastify.register(plugin);
-}
-
-if (!Number(env.API_PORT)) {
-  throw new Error("API_PORT environment variable must be a number.");
-}
-
-fastify.listen({ port: parseInt(env.API_PORT), host: "0.0.0.0" }, (error, address) => {
-  if (error) {
-    logger.error("An error occurred when trying to initialise the API:", error);
-    process.exit(1);
+  for (const plugin of Object.values(routes)) {
+    await fastify.register(plugin);
   }
 
-  logger.info(`API server listening at ${address}.`);
-});
+  if (!Number(env.API_PORT)) {
+    throw new Error("API_PORT environment variable must be a number.");
+  }
+
+  fastify.listen({ port: parseInt(env.API_PORT || "3000"), host: "0.0.0.0" }, (error, address) => {
+    if (error) {
+      logger.error("An error occurred when trying to initialise the API:", error);
+      process.exit(1);
+    }
+
+    logger.info(`API server listening at ${address}.`);
+  });
+}

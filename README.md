@@ -3,9 +3,21 @@
 <p align="center">A Discord bot by BSR that helps server admins manage user reports more efficiently and organised.</p>
 
 <p align="center">
-  <a href="https://discord.gg/R2FDvcPXTK"><img src="https://img.shields.io/discord/983301648829001768?color=5865F2&logo=discord&logoColor=white" alt="Support Server" /></a>
-  <a href="https://github.com/GodderE2D/Reindeer/actions"><img src="https://github.com/discordjs/discord.js/actions/workflows/tests.yml/badge.svg" alt="CI Tests Status" /></a>
-  <a href="https://github.com/sponsors/GodderE2D"><img src="https://img.shields.io/badge/sponsor-GodderE2D-ea4aaa?logo=github&logoColor=white" alt="GitHub Sponsors" /></a>
+  <a href="https://top.gg/bot/1126157327746211840">
+    <img src="https://top.gg/api/widget/servers/1126157327746211840.svg" alt="Top.gg Servers (for hosted bot)">
+  </a>
+  <a href="https://top.gg/bot/1126157327746211840">
+    <img src="https://top.gg/api/widget/upvotes/1126157327746211840.svg" alt="Top.gg Upvotes (for hosted bot)">
+  </a>
+  <a href="https://discord.gg/R2FDvcPXTK">
+    <img src="https://img.shields.io/discord/983301648829001768?color=5865F2&logo=discord&logoColor=white" alt="Support Server" />
+  </a>
+  <a href="https://github.com/GodderE2D/Reindeer/actions">
+    <img src="https://github.com/discordjs/discord.js/actions/workflows/tests.yml/badge.svg" alt="CI Tests Status" />
+  </a>
+  <a href="https://github.com/sponsors/GodderE2D">
+    <img src="https://img.shields.io/badge/sponsor-GodderE2D-ea4aaa?logo=github&logoColor=white" alt="GitHub Sponsors" />
+  </a>
 </p>
 
 ---
