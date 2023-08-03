@@ -28,10 +28,9 @@ const EXMAPLE_FIELDS = [
 export async function setConfirmMessage(
   message: Message<true>,
   userId: Snowflake,
+  messageReportMsg = DEFAULT_MESSAGE_REPORT_MSG,
+  userReportMsg = DEFAULT_USER_REPORT_MSG,
 ): Promise<{ messageReportMsg: string; userReportMsg: string }> {
-  let messageReportMsg = DEFAULT_MESSAGE_REPORT_MSG;
-  let userReportMsg = DEFAULT_USER_REPORT_MSG;
-
   function setEmbedFields(embed: EmbedBuilder) {
     return embed.setFields(
       { name: "Message reports", value: formatConfirmMessage(EXMAPLE_FIELDS, messageReportMsg, userId, message) },
@@ -79,7 +78,7 @@ export async function setConfirmMessage(
   await message.edit({ content: "", embeds: [setEmbedFields(embed), tipEmbed], components: [row] });
 
   const collector = message.createMessageComponentCollector({
-    time: 86_400_000,
+    time: 890_000,
     componentType: ComponentType.Button,
     filter: (i) => i.user.id === userId,
   });
@@ -116,7 +115,7 @@ export async function setConfirmMessage(
       await button.showModal(modal);
 
       const modalInteraction = await button
-        .awaitModalSubmit({ time: 86_400_000 })
+        .awaitModalSubmit({ time: 890_000 })
         .catch(async () => void (await button.reply({ content: "You took too long to respond.", ephemeral: true })));
 
       if (!modalInteraction) return;

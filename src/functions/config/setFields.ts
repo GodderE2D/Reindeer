@@ -14,13 +14,15 @@ import {
 
 import colours from "../../constants/colours.js";
 
-type Field = {
+export type Field = {
   name: string;
   placeholder: string | null;
   style: 1 | 2; // 1: Short, 2: Paragraph
   min: number;
   max: number;
 };
+
+const DEFAULT_FIELDS: Field[] = [{ name: "Reason for the report", placeholder: null, style: 2, min: 0, max: 4000 }];
 
 function formatFields(fields: Field[]) {
   return fields.map((field, index) => ({
@@ -36,7 +38,7 @@ function formatFields(fields: Field[]) {
   }));
 }
 
-export async function setFields(message: Message<true>, userId: Snowflake): Promise<Field[]> {
+export async function setFields(message: Message<true>, userId: Snowflake, fields = DEFAULT_FIELDS): Promise<Field[]> {
   function createMenuRow(fields: Field[], editOrDelete: "edit" | "delete") {
     const options: SelectMenuComponentOptionData[] = [
       ...fields.map((field, index) => ({
@@ -57,8 +59,6 @@ export async function setFields(message: Message<true>, userId: Snowflake): Prom
         .setOptions(options),
     );
   }
-
-  let fields: Field[] = [{ name: "Reason for the report", placeholder: null, style: 2, min: 0, max: 4000 }];
 
   const embed = new EmbedBuilder()
     .setColor(colours.primary)
@@ -87,7 +87,7 @@ export async function setFields(message: Message<true>, userId: Snowflake): Prom
 
   const collector = message.createMessageComponentCollector({
     filter: (i) => i.user.id === userId,
-    time: 86_400_000,
+    time: 890_000,
   });
 
   collector.on("end", async () => {

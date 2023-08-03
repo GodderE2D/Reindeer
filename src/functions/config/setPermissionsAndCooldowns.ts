@@ -17,17 +17,16 @@ import colours from "../../constants/colours.js";
 export async function setPermissionsAndCooldowns(
   message: Message,
   userId: Snowflake,
+  disallowedTargetRoles: Snowflake[] = [],
+  cooldownBypassRoles: Snowflake[] = [],
+  reportCooldown = 0,
+  duplicateReportCooldown = 0,
 ): Promise<{
   disallowedTargetRoles: Snowflake[];
   cooldownBypassRoles: Snowflake[];
   reportCooldown: number;
   duplicateReportCooldown: number;
 }> {
-  let disallowedTargetRoles: Snowflake[] = [];
-  let cooldownBypassRoles: Snowflake[] = [];
-  let reportCooldown = 0;
-  let duplicateReportCooldown = 0;
-
   function setEmbedFields(embed: EmbedBuilder) {
     return embed.setFields({
       name: "Current values",
@@ -86,7 +85,7 @@ export async function setPermissionsAndCooldowns(
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId(`setup_permissions_cooldowns_continue:${message.id}`)
-      .setLabel("Finish setup")
+      .setLabel("Continue")
       .setStyle(ButtonStyle.Primary),
   );
 
@@ -96,7 +95,7 @@ export async function setPermissionsAndCooldowns(
     components: [disallowedTargetRolesRow, cooldownBypassRolesRow, buttonsRow],
   });
 
-  const collector = message.createMessageComponentCollector({ filter: (i) => i.user.id === userId, time: 86_400_000 });
+  const collector = message.createMessageComponentCollector({ filter: (i) => i.user.id === userId, time: 890_000 });
 
   collector.on("end", async () => {
     if (collector.endReason !== "time") return;
@@ -144,7 +143,7 @@ export async function setPermissionsAndCooldowns(
         await componentInteraction.showModal(modal);
 
         const modalInteraction = await componentInteraction
-          .awaitModalSubmit({ time: 86_400_000 })
+          .awaitModalSubmit({ time: 890_000 })
           .catch(
             async () =>
               void (await componentInteraction.reply({ content: "You took too long to respond.", ephemeral: true })),

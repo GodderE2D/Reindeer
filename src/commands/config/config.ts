@@ -5,7 +5,7 @@ import { EmbedBuilder, PermissionFlagsBits, User } from "discord.js";
 import colours from "../../constants/colours.js";
 import { setChannel } from "../../functions/config/setChannel.js";
 import { setConfirmMessage } from "../../functions/config/setConfirmMessage.js";
-import { setFields } from "../../functions/config/setFields.js";
+import { Field, setFields } from "../../functions/config/setFields.js";
 import { setPermissionsAndCooldowns } from "../../functions/config/setPermissionsAndCooldowns.js";
 import { prisma } from "../../index.js";
 
@@ -62,9 +62,9 @@ export class ConfigChatInputCommand extends Subcommand {
       }));
     }
 
-    const existingGuild = await prisma.guild.findUnique({ where: { guildId: interaction.guild.id } });
+    const guild = await prisma.guild.findUnique({ where: { guildId: interaction.guild.id } });
 
-    if (!existingGuild) {
+    if (!guild) {
       return void (await interaction.reply({
         content: "Reindeer is not setup in this server yet. Please run `/setup` first.",
         ephemeral: true,
@@ -73,15 +73,15 @@ export class ConfigChatInputCommand extends Subcommand {
 
     await interaction.reply({ content: "Initialising the setup...", ephemeral: true });
 
-    const sent = await interaction.channel?.send("Please wait...").catch(() => undefined);
+    const message = await interaction.channel?.send("Please wait...").catch(() => undefined);
 
-    if (!sent) {
+    if (!message) {
       return void (await interaction.editReply(
         "Reindeer was unable to send a message in this channel, please check your permissions.",
       ));
     }
 
-    return sent;
+    return { message, guild };
   }
 
   private generateEmbed(text: string, author: User) {
@@ -92,7 +92,7 @@ export class ConfigChatInputCommand extends Subcommand {
   }
 
   public async chatInputChannel(interaction: Subcommand.ChatInputCommandInteraction<"cached">) {
-    const message = await this.checkPermissionsAndSendMessage(interaction);
+    const { message } = (await this.checkPermissionsAndSendMessage(interaction)) ?? {};
     if (!message) return;
 
     const { channel, createdTags } = (await setChannel(message, interaction.user.id)) ?? {};
@@ -122,10 +122,18 @@ export class ConfigChatInputCommand extends Subcommand {
   }
 
   public async chatInputFields(interaction: Subcommand.ChatInputCommandInteraction<"cached">) {
-    const message = await this.checkPermissionsAndSendMessage(interaction);
-    if (!message) return;
+    const { message, guild } = (await this.checkPermissionsAndSendMessage(interaction)) ?? {};
+    if (!message || !guild) return;
 
-    const fields = await setFields(message, interaction.user.id);
+    const existingFields: Field[] = guild.fieldNames.map((name, index) => ({
+      name,
+      placeholder: guild.fieldPlaceholders[index],
+      style: guild.fieldStyles[index] as 1 | 2,
+      min: guild.fieldMins[index],
+      max: guild.fieldMaxes[index],
+    }));
+
+    const fields = await setFields(message, interaction.user.id, existingFields);
 
     await prisma.guild.update({
       where: { guildId: interaction.guild.id },
@@ -145,10 +153,15 @@ export class ConfigChatInputCommand extends Subcommand {
   }
 
   public async chatInputConfirmationMessage(interaction: Subcommand.ChatInputCommandInteraction<"cached">) {
-    const message = await this.checkPermissionsAndSendMessage(interaction);
-    if (!message) return;
+    const { message, guild } = (await this.checkPermissionsAndSendMessage(interaction)) ?? {};
+    if (!message || !guild) return;
 
-    const { messageReportMsg, userReportMsg } = await setConfirmMessage(message, interaction.user.id);
+    const { messageReportMsg, userReportMsg } = await setConfirmMessage(
+      message,
+      interaction.user.id,
+      guild.messageReportConfirmMessage,
+      guild.userReportConfirmMessage,
+    );
 
     await prisma.guild.update({
       where: { guildId: interaction.guild.id },
@@ -165,11 +178,18 @@ export class ConfigChatInputCommand extends Subcommand {
   }
 
   public async chatInputPermissionsCooldowns(interaction: Subcommand.ChatInputCommandInteraction<"cached">) {
-    const message = await this.checkPermissionsAndSendMessage(interaction);
-    if (!message) return;
+    const { message, guild } = (await this.checkPermissionsAndSendMessage(interaction)) ?? {};
+    if (!message || !guild) return;
 
     const { disallowedTargetRoles, cooldownBypassRoles, reportCooldown, duplicateReportCooldown } =
-      await setPermissionsAndCooldowns(message, interaction.user.id);
+      await setPermissionsAndCooldowns(
+        message,
+        interaction.user.id,
+        guild.disallowedTargetRoles,
+        guild.reportCooldownBypassRoles,
+        guild.reportCooldown,
+        guild.duplicateReportCooldown,
+      );
 
     await prisma.guild.update({
       where: { guildId: interaction.guild.id },

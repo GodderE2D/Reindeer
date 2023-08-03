@@ -54,7 +54,7 @@ export async function setChannel(originalMessage: Message<true>, userId: Snowfla
   const componentInteraction = await message
     .awaitMessageComponent({
       filter: (i) => i.user.id === userId,
-      time: 86_400_000,
+      time: 890_000,
     })
     .catch(
       async () =>
