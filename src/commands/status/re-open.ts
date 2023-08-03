@@ -23,7 +23,7 @@ export class ReopenChatInputCommand extends Command {
             option.setName("report_number").setDescription("The report number to re-open").setRequired(true),
           ),
       {
-        idHints: ["1135872700527693935"],
+        idHints: [],
       },
     );
   }

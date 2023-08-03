@@ -64,7 +64,7 @@ export class TrackChatInputCommand extends Subcommand {
               ),
           ),
       {
-        idHints: ["1134748852444987392"],
+        idHints: [],
       },
     );
   }

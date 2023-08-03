@@ -49,7 +49,7 @@ export class ConfigChatInputCommand extends Subcommand {
               .setDescription("Configure permissions and cooldowns for this server."),
           ),
       {
-        idHints: ["1136553435802636338"],
+        idHints: [],
       },
     );
   }

@@ -48,7 +48,7 @@ export class StatsChatInputCommand extends Subcommand {
               ),
           ),
       {
-        idHints: ["1136582835231281192"],
+        idHints: [],
         guildIds: [env.DEVELOPMENT_GUILD_ID],
       },
     );

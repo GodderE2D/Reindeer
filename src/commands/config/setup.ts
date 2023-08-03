@@ -26,7 +26,7 @@ export class SetupChatInputCommand extends Command {
           .setDMPermission(false)
           .setDefaultMemberPermissions("0"),
       {
-        idHints: ["1135945345579360276"],
+        idHints: [],
       },
     );
   }

@@ -30,7 +30,7 @@ export class CloseChatInputCommand extends Command {
             option.setName("report_number").setDescription("The report number to close").setRequired(true),
           ),
       {
-        idHints: ["1135872697105129472"],
+        idHints: [],
       },
     );
   }

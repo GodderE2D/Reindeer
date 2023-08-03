@@ -19,7 +19,7 @@ export class ReportUserContextMenuCommand extends Command {
           .setType(ApplicationCommandType.User)
           .setDMPermission(false),
       {
-        idHints: ["1134447489769025606"],
+        idHints: [],
       },
     );
   }

@@ -22,7 +22,7 @@ export class InviteCommand extends Command {
             option.setName("hide").setDescription("Whether to hide the response (default: true)"),
           ),
       {
-        idHints: ["1136569664001032192"],
+        idHints: [],
       },
     );
   }

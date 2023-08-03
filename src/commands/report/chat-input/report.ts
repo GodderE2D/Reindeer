@@ -46,7 +46,7 @@ export class ReportChatInputCommand extends Subcommand {
               ),
           ),
       {
-        idHints: ["1127605243765604372"],
+        idHints: [],
       },
     );
   }

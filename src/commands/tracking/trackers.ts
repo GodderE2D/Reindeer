@@ -40,7 +40,7 @@ export class TrackerChatInputCommand extends Command {
               .setRequired(true),
           ),
       {
-        idHints: ["1134803437628948542"],
+        idHints: [],
       },
     );
   }

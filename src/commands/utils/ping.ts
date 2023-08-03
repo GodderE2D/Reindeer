@@ -19,7 +19,7 @@ export class PingCommand extends Command {
           .setName(this.name)
           .setDescription(this.description),
       {
-        idHints: ["1126528188047179917"],
+        idHints: [],
       },
     );
   }
