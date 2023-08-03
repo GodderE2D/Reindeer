@@ -28,7 +28,11 @@ export class PingCommand extends Command {
     const checkingEmbed = new EmbedBuilder()
       .setColor(colours.primary)
       .setDescription(
-        [`**Websocket heartbeat:** ${interaction.client.ws.ping}ms`, "**Roundtrip latency:** Checking..."].join("\n"),
+        [
+          `**Websocket heartbeat:** ${interaction.client.ws.ping}ms`,
+          "**Roundtrip latency:** Checking...",
+          `**Uptime**: Since <t:${Math.floor((Date.now() - interaction.client.uptime) / 1000)}:R>`,
+        ].join("\n"),
       );
 
     const sent = await interaction.reply({
@@ -44,6 +48,7 @@ export class PingCommand extends Command {
         [
           `**Websocket heartbeat:** ${interaction.client.ws.ping}ms`,
           `**Roundtrip latency:** ${roundtripLatency}ms`,
+          `**Uptime**: Since <t:${Math.floor((Date.now() - interaction.client.uptime) / 1000)}:R>`,
         ].join("\n"),
       );
 
