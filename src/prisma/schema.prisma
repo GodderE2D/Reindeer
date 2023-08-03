@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_CONNECTION_URL")
+}
+
+model GuildMember {
+  userId    String   @id @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  guild   Guild  @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  guildId String
+
+  // Reports are the reports that the user has made
+  reports Report[] @relation("reports")
+  // History is the reports that the user has been reported for
+  history Report[] @relation("history")
+
+  createdTrackedContent TrackedContent[]
+
+  @@map("guild_member")
+}
+
+model Guild {
+  guildId               String        @id @map("guild_id")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  members               GuildMember[]
+  reports               Report[]
+  forumChannelId        String        @map("forum_channel_id")
+  authorFeedbackEnabled Boolean       @default(false) @map("author_feedback_enabled")
+
+  messageTagId  String @map("message_tag_id")
+  userTagId     String @map("user_tag_id")
+  openTagId     String @map("open_tag_id")
+  approvedTagId String @map("approved_tag_id")
+  rejectedTagId String @map("rejected_tag_id")
+
+  trackedContent TrackedContent[]
+
+  fieldNames        String[] @map("field_names")
+  fieldPlaceholders String[] @map("field_placeholders")
+  fieldStyles       Int[]    @map("field_styles")
+  fieldMins         Int[]    @map("field_mins")
+  fieldMaxes        Int[]    @map("field_maxes")
+
+  messageReportConfirmMessage String @map("message_report_confirm_message")
+  userReportConfirmMessage    String @map("user_report_confirm_message")
+
+  disallowedTargetRoles     String[] @map("disallowed_target_roles") // report target cannot have these roles
+  reportCooldown            Int      @map("report_cooldown") // in seconds
+  duplicateReportCooldown   Int      @map("duplicate_report_cooldown") // in seconds
+  reportCooldownBypassRoles String[] @map("report_cooldown_bypass_roles")
+
+  @@map("guild")
+}
+
+model Report {
+  id        String       @id @default(cuid()) @map("report_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+  number    Int
+  type      ReportType
+  status    ReportStatus @default(Open)
+
+  guild          Guild  @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  guildId        String @map("guild_id")
+  threadId       String @map("thread_id")
+  startMessageId String @map("start_message_id")
+
+  author   GuildMember @relation(name: "reports", fields: [authorId], references: [userId], onDelete: Cascade)
+  authorId String      @map("author_id")
+
+  target   GuildMember @relation(name: "history", fields: [targetId], references: [userId], onDelete: Cascade)
+  targetId String      @map("target_id")
+
+  messageId   String?  @map("message_id")
+  channelId   String?  @map("channel_id")
+  fieldValues String[] @map("field_values")
+
+  trackedContent TrackedContent[]
+
+  @@unique([number, guildId])
+  @@map("report")
+}
+
+model TrackedContent {
+  id             String     @id @default(cuid())
+  createdAt      DateTime   @default(now()) @map("created_at")
+  type           ReportType
+  isOriginal     Boolean    @default(true) @map("is_original") // if it's the reported message that's being tracked
+  notificationId String?    @map("reply_id") // message id for the notification message in the report thread
+
+  contentId String  @map("content_id") // message or user id
+  channelId String? @map("channel_id") // only for message trackers
+  authorId  String? @map("author_id") // only for message trackers
+
+  guild   Guild  @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  guildId String @map("guild_id")
+
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reportId String @map("report_id")
+
+  creator   GuildMember? @relation(fields: [creatorId], references: [userId], onDelete: Cascade)
+  creatorId String?      @map("creator_id")
+
+  @@unique([contentId, reportId])
+  @@map("tracked_message")
+}
+
+enum ReportType {
+  Message
+  User
+}
+
+enum ReportStatus {
+  Open
+  Approved
+  Rejected
+}

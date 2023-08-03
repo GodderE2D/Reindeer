@@ -1,0 +1,112 @@
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  messageLink,
+} from "discord.js";
+
+import colours from "../constants/colours.js";
+import { prisma } from "../index.js";
+
+export async function setReportStatus(
+  status: "Open" | "Approved" | "Rejected",
+  number: number,
+  interaction: ChatInputCommandInteraction<"cached"> | ButtonInteraction<"cached">,
+) {
+  const report = await prisma.report.findUnique({
+    where: {
+      number_guildId: { number, guildId: interaction.guild.id },
+    },
+    include: { guild: true },
+  });
+
+  if (!report) {
+    return void interaction.editReply(`Report #${number} does not exist.`);
+  }
+
+  if (report.status === status) {
+    return void interaction.editReply(
+      `Report #${number} is already ${
+        status === "Open" ? "open" : status === "Approved" ? "marked as approved" : "marked as rejected"
+      }.`,
+    );
+  }
+
+  const thread = interaction.guild.channels.cache.get(report.threadId);
+
+  if (!thread?.isThread()) {
+    return void interaction.editReply(`The thread for report #${number} has been deleted or Reindeer cannot view it.`);
+  }
+
+  try {
+    await thread.setAppliedTags([
+      report.type === "Message" ? report.guild.messageTagId : report.guild.userTagId,
+      status === "Rejected"
+        ? report.guild.rejectedTagId
+        : status === "Approved"
+        ? report.guild.approvedTagId
+        : report.guild.openTagId,
+    ]);
+  } catch (error) {
+    return void interaction.editReply(
+      `Reindeer cannot manage this channel or a tag on this channel have been deleted and must be re-configured using \`/config\`.`,
+    );
+  }
+
+  const firstMessage = await thread.messages.fetch(report.startMessageId).catch(() => undefined);
+
+  if (firstMessage) {
+    const openedRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`report_approve:${number}`)
+        .setLabel("Approve & Close")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder() //
+        .setCustomId(`report_reject:${number}`)
+        .setLabel("Reject & Close")
+        .setStyle(ButtonStyle.Danger),
+    );
+
+    if (report.messageId && report.channelId) {
+      openedRow.addComponents(
+        new ButtonBuilder()
+          .setURL(messageLink(report.channelId, report.messageId, report.guildId))
+          .setLabel("View Message")
+          .setStyle(ButtonStyle.Link),
+      );
+    }
+
+    const closedRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`report_reopen:${report.number}`)
+        .setLabel("Re-open")
+        .setStyle(ButtonStyle.Secondary),
+    );
+
+    await firstMessage.edit({ components: [status === "Open" ? openedRow : closedRow] });
+  }
+
+  const notificationEmbed = new EmbedBuilder()
+    .setColor(status === "Open" ? colours.blue : status === "Approved" ? colours.green : colours.error)
+    .setAuthor({
+      name: `${interaction.user.tag} (${interaction.user.id})`,
+      iconURL: interaction.user.displayAvatarURL({ forceStatic: true }),
+    })
+    .setDescription(
+      `${interaction.user} has ${
+        status === "Open" ? "re-opened" : status === "Approved" ? "approved & closed" : "rejected & closed"
+      } this report.`,
+    )
+    .setTimestamp();
+
+  await thread.send({ embeds: [notificationEmbed] }).catch(() => undefined);
+  await thread.setArchived(status !== "Open");
+
+  await prisma.report.update({ where: { id: report.id }, data: { status } });
+  if (status !== "Open") await prisma.trackedContent.deleteMany({ where: { reportId: report.id } });
+
+  return true;
+}
