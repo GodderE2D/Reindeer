@@ -23,6 +23,7 @@ export class RestartCommand extends Command {
           .setDescription(this.description),
       {
         idHints: [],
+        guildIds: [env.DEVELOPMENT_GUILD_ID],
       },
     );
   }
