@@ -58,9 +58,11 @@ export async function handleCommandError(error: Error, interaction: CommandInter
 
     const replyEmbed = new EmbedBuilder()
       .setColor(colours.error)
-      .setDescription(`${emojis.error} An unexpected error occurred, please try again later.`)
+      .setDescription(
+        `${emojis.error} An unexpected error occurred, please try again later. If this issue persists, please [join our support server](https://discord.gg/R2FDvcPXTK).`,
+      )
       .setFooter({
-        text: errorCode,
+        text: `Error code: ${errorCode}`,
       });
 
     if (!interaction.replied) {

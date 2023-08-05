@@ -107,26 +107,46 @@ export async function setChannel(originalMessage: Message<true>, userId: Snowfla
       },
     };
   } else if (componentInteraction.isButton()) {
-    const channel = await message.guild.channels.create({
-      name: "reports",
-      type: ChannelType.GuildForum,
-      permissionOverwrites: [
-        // Deny @everyone permission to view the channel
-        { id: message.guild.id, type: OverwriteType.Role, deny: PermissionFlagsBits.ViewChannel },
-        // Allow Reindeer to manage the channel
-        {
-          id: message.author.id,
-          type: OverwriteType.Member,
-          allow: [
-            PermissionFlagsBits.ViewChannel,
-            PermissionFlagsBits.ManageChannels,
-            PermissionFlagsBits.ManageMessages,
-            PermissionFlagsBits.SendMessages,
-          ],
-        },
-      ],
-      availableTags: TAGS,
-    });
+    if (!message.guild.features.includes("COMMUNITY")) {
+      return void (await message.edit({
+        content:
+          "In order to create a forum channel, your server must have be a community server. Please enable Community in your server's settings and try again.",
+        embeds: [],
+        components: [disableComponents(menuRow), disableComponents(buttonRow)],
+      }));
+    }
+
+    let channel = await message.guild.channels
+      .create({
+        name: "reports",
+        type: ChannelType.GuildForum,
+        permissionOverwrites: [
+          // Deny @everyone permission to view the channel
+          { id: message.guild.id, type: OverwriteType.Role, deny: PermissionFlagsBits.ViewChannel },
+          // Allow Reindeer to manage the channel
+          {
+            id: message.author.id,
+            type: OverwriteType.Member,
+            allow: [
+              PermissionFlagsBits.ViewChannel,
+              PermissionFlagsBits.ManageChannels,
+              PermissionFlagsBits.ManageMessages,
+              PermissionFlagsBits.SendMessages,
+            ],
+          },
+        ],
+        availableTags: TAGS,
+      })
+      .catch(() => undefined);
+
+    if (!channel) {
+      channel = await message.guild.channels.create({
+        name: "reports",
+        type: ChannelType.GuildForum,
+        permissionOverwrites: [],
+        availableTags: TAGS,
+      });
+    }
 
     return {
       channel,
