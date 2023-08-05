@@ -9,6 +9,7 @@ const envVarCheck = (env: NodeJS.ProcessEnv = process.env) => {
     DISCORD_TOKEN: z.string(),
     DB_CONNECTION_URL: z.string(),
     TOPGG_TOKEN: z.string().optional(),
+    SENTRY_DSN: z.string().optional(),
     DEVELOPMENT_GUILD_ID: z.string(),
     BOT_OWNER_ID: z.string(),
     ERROR_LOGS_CHANNEL_ID: z.string(),

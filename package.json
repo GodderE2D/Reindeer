@@ -8,14 +8,16 @@
     "dev": "nodemon",
     "test": "yarn build && yarn lint:check && yarn format:check",
     "test:fix": "yarn build && yarn lint && yarn format",
-    "build": "tsc",
+    "build": "tsc && yarn run sentry:sourcemaps",
+    "build:ci": "tsc",
     "build:dev": "tsc --watch",
     "push": "prisma db push",
     "generate": "prisma generate",
     "lint": "eslint --fix .",
     "lint:check": "eslint .",
     "format": "prettier .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org blue-shark-river --project node ./dist && sentry-cli sourcemaps upload --org blue-shark-river --project node ./dist"
   },
   "repository": {
     "type": "git",
@@ -41,6 +43,7 @@
     "@sapphire/framework": "^4.5.0",
     "@sapphire/plugin-subcommands": "^4.0.1",
     "@sapphire/utilities": "^3.12.0",
+    "@sentry/node": "^7.61.1",
     "dayjs": "^1.11.9",
     "discord.js": "^14.12.1",
     "dotenv": "^16.3.1",

@@ -6,6 +6,7 @@ import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import { PrismaClient } from "@prisma/client";
 import { SapphireClient } from "@sapphire/framework";
+import Sentry from "@sentry/node";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration.js";
 import relativeTime from "dayjs/plugin/relativeTime.js";
@@ -33,6 +34,13 @@ logger.info(`Node environment: ${env.NODE_ENV}`);
 // Dayjs plugins
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
+
+// Initialise Sentry
+if (env.NODE_ENV === "production" && env.SENTRY_DSN?.length) {
+  Sentry.init({
+    dsn: env.SENTRY_DSN,
+  });
+}
 
 // Prisma client
 export const prisma = new PrismaClient();

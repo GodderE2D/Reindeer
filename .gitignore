@@ -30,3 +30,6 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Sentry Auth Token
+.sentryclirc
