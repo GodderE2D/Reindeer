@@ -177,7 +177,7 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
           .awaitModalSubmit({ time: 300_000 })
           .catch(
             async () =>
-              void (await componentInteraction.reply({ content: "You took too long to respond.", ephemeral: true })),
+              void (await componentInteraction.followUp({ content: "You took too long to respond.", ephemeral: true })),
           );
 
         if (!modalInteraction) return;

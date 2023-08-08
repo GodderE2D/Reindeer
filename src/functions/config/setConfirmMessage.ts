@@ -116,7 +116,7 @@ export async function setConfirmMessage(
 
       const modalInteraction = await button
         .awaitModalSubmit({ time: 890_000 })
-        .catch(async () => void (await button.reply({ content: "You took too long to respond.", ephemeral: true })));
+        .catch(async () => void (await button.followUp({ content: "You took too long to respond.", ephemeral: true })));
 
       if (!modalInteraction) return;
 
