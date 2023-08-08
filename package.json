@@ -17,7 +17,7 @@
     "lint:check": "eslint .",
     "format": "prettier .",
     "format:check": "prettier --check .",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org blue-shark-river --project node ./dist && sentry-cli sourcemaps upload --org blue-shark-river --project node ./dist"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org blue-shark-river --project reindeer ./dist && sentry-cli sourcemaps upload --org blue-shark-river --project reindeer ./dist"
   },
   "repository": {
     "type": "git",
