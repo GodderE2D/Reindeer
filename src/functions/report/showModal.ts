@@ -13,7 +13,7 @@ export async function showModal(
   isMessageReport: boolean,
 ) {
   const modal = new ModalBuilder()
-    .setCustomId("report_modal")
+    .setCustomId(`report_modal:${interaction.id}`)
     .setTitle(`Report ${isMessageReport ? "Message" : "User"}`);
 
   for (const [index, fieldName] of guildData.fieldNames.entries()) {
@@ -38,11 +38,12 @@ export async function showModal(
 
   const modalResponse = await interaction
     .awaitModalSubmit({
-      time: 1000 * 60 * 15,
+      time: 1000 * 60 * 14,
+      filter: (i) => i.customId === `report_modal:${interaction.id}`,
     })
     .catch(() => {
       interaction.followUp({
-        content: "You took longer than 15 minutes to respond. Please try again.",
+        content: "You took longer than 14 minutes to respond. Please try again.",
         ephemeral: true,
       });
     });

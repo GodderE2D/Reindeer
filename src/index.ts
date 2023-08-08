@@ -65,7 +65,10 @@ client.login(env.DISCORD_TOKEN);
 // Top.gg statistics
 if (env.NODE_ENV === "production" && env.TOPGG_TOKEN?.length) {
   const poster = AutoPoster(env.TOPGG_TOKEN, client);
-  poster.on("error", (error) => logger.error("Top.gg AutoPoster received an error:", error));
+  poster.on("error", (error) => {
+    logger.error("Top.gg AutoPoster received an error:", error);
+    Sentry.captureException(error, { extra: { type: "topgg-autoposter" } });
+  });
 }
 
 // Create collections
