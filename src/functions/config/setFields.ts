@@ -131,6 +131,7 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
                 .setLabel("Label")
                 .setValue(field?.name ?? "")
                 .setStyle(TextInputStyle.Short)
+                .setMinLength(1)
                 .setMaxLength(45),
             ),
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -149,6 +150,7 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
                 .setValue(field ? (field.style === 1 ? "short" : "paragraph") : "")
                 .setPlaceholder("'short' or 'paragraph'")
                 .setStyle(TextInputStyle.Short)
+                .setMinLength(5)
                 .setMaxLength(9),
             ),
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -158,6 +160,7 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
                 .setValue(field ? `${field.min}` : "0")
                 .setPlaceholder("A number (minimum 0, maximum 4000)")
                 .setStyle(TextInputStyle.Short)
+                .setMinLength(0)
                 .setMaxLength(4),
             ),
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -167,6 +170,7 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
                 .setValue(field ? `${field.max}` : "4000")
                 .setPlaceholder("A number (minimum 1, maximum 4000)")
                 .setStyle(TextInputStyle.Short)
+                .setMinLength(0)
                 .setMaxLength(4),
             ),
           );
@@ -180,7 +184,7 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
               void (await componentInteraction.followUp({ content: "You took too long to respond.", ephemeral: true })),
           );
 
-        if (!modalInteraction) return;
+        if (!modalInteraction?.isModalSubmit()) return;
 
         if (!["short", "paragraph"].includes(modalInteraction.fields.getTextInputValue("setup_field_style"))) {
           return void modalInteraction.reply({
