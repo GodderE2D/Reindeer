@@ -131,7 +131,6 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
                 .setLabel("Label")
                 .setValue(field?.name ?? "")
                 .setStyle(TextInputStyle.Short)
-                .setMinLength(1)
                 .setMaxLength(45),
             ),
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -150,7 +149,6 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
                 .setValue(field ? (field.style === 1 ? "short" : "paragraph") : "")
                 .setPlaceholder("'short' or 'paragraph'")
                 .setStyle(TextInputStyle.Short)
-                .setMinLength(5)
                 .setMaxLength(9),
             ),
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -160,7 +158,7 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
                 .setValue(field ? `${field.min}` : "0")
                 .setPlaceholder("A number (minimum 0, maximum 4000)")
                 .setStyle(TextInputStyle.Short)
-                .setMinLength(0)
+                .setMinLength(1)
                 .setMaxLength(4),
             ),
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -170,7 +168,7 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
                 .setValue(field ? `${field.max}` : "4000")
                 .setPlaceholder("A number (minimum 1, maximum 4000)")
                 .setStyle(TextInputStyle.Short)
-                .setMinLength(0)
+                .setMinLength(1)
                 .setMaxLength(4),
             ),
           );
