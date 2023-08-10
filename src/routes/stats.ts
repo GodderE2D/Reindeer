@@ -15,6 +15,7 @@ export const stats: FastifyPluginCallback = (fastify, _opts, done) => {
       memberCount,
       channelCount: client.channels.cache.size,
       commandsRanInPastDay,
+      ping: client.ws.ping,
     });
   });
 

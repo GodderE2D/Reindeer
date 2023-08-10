@@ -109,6 +109,12 @@ model TrackedContent {
   @@map("tracked_message")
 }
 
+model Vote {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now())
+}
+
 enum ReportType {
   Message
   User
