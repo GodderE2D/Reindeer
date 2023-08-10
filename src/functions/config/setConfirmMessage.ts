@@ -94,7 +94,7 @@ export async function setConfirmMessage(
       const isMessage = button.customId.startsWith("setup_confirm_message");
 
       const modal = new ModalBuilder()
-        .setCustomId(`setup_confirm_modal:${message.id}`)
+        .setCustomId(`setup_confirm_modal:${button.id}`)
         .setTitle(`Edit confirmation message for ${isMessage ? "message" : "user"} reports`) // exactly 45 chars :o
         .addComponents(
           new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -115,7 +115,7 @@ export async function setConfirmMessage(
       await button.showModal(modal);
 
       const modalInteraction = await button
-        .awaitModalSubmit({ time: 890_000 })
+        .awaitModalSubmit({ filter: (i) => i.customId.endsWith(button.id), time: 890_000 })
         .catch(async () => void (await button.followUp({ content: "You took too long to respond.", ephemeral: true })));
 
       if (!modalInteraction) return;

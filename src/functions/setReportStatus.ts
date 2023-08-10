@@ -52,7 +52,7 @@ export async function setReportStatus(
     ]);
   } catch (error) {
     return void interaction.editReply(
-      `Reindeer cannot manage this channel or a tag on this channel have been deleted and must be re-configured using \`/config\`.`,
+      `Reindeer cannot manage this channel or a tag on this channel have been deleted and must be re-configured using \`/config\`.\nDoes Reindeer have the Send Messages in Threads permission in ${thread.parent}?`,
     );
   }
 

@@ -129,9 +129,14 @@ export async function setChannel(originalMessage: Message<true>, userId: Snowfla
             type: OverwriteType.Member,
             allow: [
               PermissionFlagsBits.ViewChannel,
+              PermissionFlagsBits.ManageThreads,
               PermissionFlagsBits.ManageChannels,
               PermissionFlagsBits.ManageMessages,
               PermissionFlagsBits.SendMessages,
+              // sigh
+              // https://discord.com/channels/222078108977594368/222197033908436994/1139207283356729444
+              // https://github.com/discordjs/guide/commit/3ea2ef3af749dc4e80b129b56b900f9e2d6faec6
+              PermissionFlagsBits.SendMessagesInThreads,
             ],
           },
         ],

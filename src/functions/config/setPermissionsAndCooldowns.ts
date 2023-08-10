@@ -126,7 +126,7 @@ export async function setPermissionsAndCooldowns(
         const isReportCooldown = componentInteraction.customId.startsWith(`setup_cooldowns_report_cooldown`);
 
         const modal = new ModalBuilder()
-          .setCustomId("setup_cooldowns_modal")
+          .setCustomId(`setup_cooldowns_modal:${componentInteraction.customId}`)
           .setTitle(`Set ${isReportCooldown ? "report cooldown" : "duplicate report cooldown"}`)
           .addComponents(
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -143,7 +143,7 @@ export async function setPermissionsAndCooldowns(
         await componentInteraction.showModal(modal);
 
         const modalInteraction = await componentInteraction
-          .awaitModalSubmit({ time: 890_000 })
+          .awaitModalSubmit({ filter: (i) => i.customId.endsWith(componentInteraction.id), time: 890_000 })
           .catch(
             async () =>
               void (await componentInteraction.followUp({ content: "You took too long to respond.", ephemeral: true })),

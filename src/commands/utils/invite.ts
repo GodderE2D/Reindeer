@@ -2,6 +2,7 @@ import { ChatInputCommand, Command } from "@sapphire/framework";
 import { EmbedBuilder, OAuth2Scopes, PermissionFlagsBits } from "discord.js";
 
 import colours from "../../constants/colours.js";
+import { env } from "../../index.js";
 
 export class InviteCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -29,7 +30,7 @@ export class InviteCommand extends Command {
 
   public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const hide = interaction.options.getBoolean("hide") ?? true;
-    const inviteLink = interaction.client.generateInvite({
+    let inviteLink = interaction.client.generateInvite({
       permissions: [
         PermissionFlagsBits.ViewAuditLog,
         PermissionFlagsBits.ManageChannels,
@@ -44,6 +45,10 @@ export class InviteCommand extends Command {
       ],
       scopes: [OAuth2Scopes.Bot, OAuth2Scopes.ApplicationsCommands],
     });
+
+    if (env.NODE_ENV === "production") {
+      inviteLink = inviteLink + "&redirect_uri=https%3A%2F%2Freindeer.bsr.gg%2Fthanks&response_type=code";
+    }
 
     const embed = new EmbedBuilder()
       .setColor(colours.primary)

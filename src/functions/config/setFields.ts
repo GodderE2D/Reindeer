@@ -122,7 +122,7 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
         const field = fields[parseInt(componentInteraction.values[0])];
 
         const modal = new ModalBuilder()
-          .setCustomId(`setup_modal_edit_field`)
+          .setCustomId(`setup_modal_edit_field:${componentInteraction.id}`)
           .setTitle(field ? `Edit field ${fields.indexOf(field) + 1}` : "Add new field")
           .addComponents(
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -176,13 +176,14 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
         await componentInteraction.showModal(modal);
 
         const modalInteraction = await componentInteraction
-          .awaitModalSubmit({ time: 300_000 })
+          .awaitModalSubmit({ filter: (i) => i.customId.endsWith(componentInteraction.id), time: 300_000 })
           .catch(
             async () =>
               void (await componentInteraction.followUp({ content: "You took too long to respond.", ephemeral: true })),
           );
 
         if (!modalInteraction?.isModalSubmit()) return;
+        if (modalInteraction.replied) return;
 
         if (!["short", "paragraph"].includes(modalInteraction.fields.getTextInputValue("setup_field_style"))) {
           return void modalInteraction.reply({
