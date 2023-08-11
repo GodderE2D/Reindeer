@@ -21,6 +21,7 @@ export class StatsChatInputCommand extends Subcommand {
       subcommands: [
         { name: "general", chatInputRun: "chatInputGeneral" },
         { name: "top-servers", chatInputRun: "chatInputTopServers" },
+        { name: "cache", chatInputRun: "chatInputCache" },
       ],
     });
   }
@@ -43,6 +44,14 @@ export class StatsChatInputCommand extends Subcommand {
             command
               .setName("top-servers")
               .setDescription("See top servers Reindeer is in.")
+              .addBooleanOption((option) =>
+                option.setName("hide").setDescription("Whether to hide the reply (default: true)"),
+              ),
+          )
+          .addSubcommand((command) =>
+            command
+              .setName("cache")
+              .setDescription("See statistics about cached structures.")
               .addBooleanOption((option) =>
                 option.setName("hide").setDescription("Whether to hide the reply (default: true)"),
               ),
@@ -93,6 +102,36 @@ export class StatsChatInputCommand extends Subcommand {
       .setTitle("Top servers with Reindeer")
       .setDescription(
         top10.map((guild, index) => `${index + 1}. **${guild.name}** (${formatNumber(guild.memberCount)})`).join("\n"),
+      );
+
+    return await interaction.reply({ embeds: [embed], ephemeral: hide });
+  }
+
+  public async chatInputCache(interaction: Subcommand.ChatInputCommandInteraction<"cached">) {
+    const hide = interaction.options.getBoolean("hide") ?? true;
+    const { client } = interaction;
+
+    const messageCount = client.channels.cache.reduce(
+      (acc, channel) => acc + ("messages" in channel ? channel.messages.cache.size : 0),
+      0,
+    );
+    const memberCount = client.guilds.cache.reduce((acc, guild) => acc + guild.members.cache.size, 0);
+
+    const embed = new EmbedBuilder()
+      .setColor(colours.pink)
+      .setAuthor({
+        name: "Reindeer Stats",
+        iconURL: "https://cdn.discordapp.com/avatars/1126157327746211840/0cdcb588f96ec9cfc5d4f9685c8987f4.webp",
+      })
+      .setTitle("Process Statistics")
+      .setDescription(
+        [
+          `- **Cached guilds**: \`${client.guilds.cache.size}\``,
+          `- **Cached channels**: \`${client.channels.cache.size}\``,
+          `- **Cached messages**: \`${messageCount}\``,
+          `- **Cached users**: \`${client.users.cache.size}\``,
+          `- **Cached members**: \`${memberCount}\``,
+        ].join("\n"),
       );
 
     return await interaction.reply({ embeds: [embed], ephemeral: hide });

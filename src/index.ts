@@ -13,6 +13,7 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import { Collection, Snowflake, version } from "discord.js";
 import { Partials } from "discord.js";
 import Fastify from "fastify";
+import { collectDefaultMetrics } from "prom-client";
 import { AutoPoster } from "topgg-autoposter";
 
 import { intents } from "./constants/intents.js";
@@ -77,6 +78,9 @@ export const commandsRan = new Collection<Snowflake, { createdAt: Date; name: st
 // Catch uncaught errors
 process.on("unhandledRejection", (err) => logger.error("Encountered an unhandled promise rejection:", err));
 process.on("uncaughtException", (err) => logger.error("Encountered an uncaught exception:", err));
+
+// Prometheus metrics
+collectDefaultMetrics();
 
 // Fastify client
 if (env.API_KEY?.length) {
