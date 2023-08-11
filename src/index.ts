@@ -13,12 +13,12 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import { Collection, Snowflake, version } from "discord.js";
 import { Partials } from "discord.js";
 import Fastify from "fastify";
-import { collectDefaultMetrics } from "prom-client";
 import { AutoPoster } from "topgg-autoposter";
 
 import { intents } from "./constants/intents.js";
 import { makeCache } from "./constants/makeCache.js";
 import envVarCheck from "./functions/envCheck.js";
+import registerMetrics from "./functions/registerMetrics.js";
 import Logger from "./logger.js";
 import * as routes from "./routes.js";
 
@@ -80,7 +80,7 @@ process.on("unhandledRejection", (err) => logger.error("Encountered an unhandled
 process.on("uncaughtException", (err) => logger.error("Encountered an uncaught exception:", err));
 
 // Prometheus metrics
-collectDefaultMetrics();
+registerMetrics();
 
 // Fastify client
 if (env.API_KEY?.length) {
