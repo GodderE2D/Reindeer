@@ -14,4 +14,8 @@ export const makeCache = Options.cacheWithLimits({
   ReactionUserManager: 0,
   StageInstanceManager: 0,
   VoiceStateManager: 0,
+
+  // @ts-expect-error bug, see https://github.com/discordjs/discord.js/issues/9759
+  DMMessageManager: 200,
+  GuildMessageManager: 200,
 });
