@@ -37,8 +37,12 @@ export async function setPermissionsAndCooldowns(
         `- **Cooldown bypass roles**: ${
           cooldownBypassRoles.length ? `<@&${cooldownBypassRoles.join(">, <@&")}>` : "None"
         }`,
-        `- **Report cooldown**: ${dayjs.duration({ seconds: reportCooldown }).humanize()}`,
-        `- **Duplicate report cooldown**: ${dayjs.duration({ seconds: duplicateReportCooldown }).humanize()}`,
+        `- **Report cooldown**: ${
+          reportCooldown === 0 ? "None" : dayjs.duration({ seconds: reportCooldown }).humanize()
+        }`,
+        `- **Duplicate report cooldown**: ${
+          duplicateReportCooldown === 0 ? "None" : dayjs.duration({ seconds: duplicateReportCooldown }).humanize()
+        }`,
       ].join("\n"),
     });
   }
@@ -64,6 +68,7 @@ export async function setPermissionsAndCooldowns(
     new RoleSelectMenuBuilder()
       .setCustomId(`setup_permissions_disallowed_target_roles:${message.id}`)
       .setPlaceholder("Select disallowed target roles")
+      .setMinValues(0)
       .setMaxValues(25),
   );
 
@@ -71,6 +76,7 @@ export async function setPermissionsAndCooldowns(
     new RoleSelectMenuBuilder()
       .setCustomId(`setup_permissions_cooldown_bypass_roles:${message.id}`)
       .setPlaceholder("Select cooldown bypass roles")
+      .setMinValues(0)
       .setMaxValues(25),
   );
 
@@ -113,7 +119,11 @@ export async function setPermissionsAndCooldowns(
           cooldownBypassRoles = componentInteraction.values;
         }
 
-        return void (await componentInteraction.deferUpdate());
+        componentInteraction.deferUpdate();
+        return void (await message.edit({
+          embeds: [setEmbedFields(embed)],
+          components: [disallowedTargetRolesRow, cooldownBypassRolesRow, buttonsRow],
+        }));
       }
 
       if (componentInteraction.isButton()) {
@@ -126,7 +136,7 @@ export async function setPermissionsAndCooldowns(
         const isReportCooldown = componentInteraction.customId.startsWith(`setup_cooldowns_report_cooldown`);
 
         const modal = new ModalBuilder()
-          .setCustomId(`setup_cooldowns_modal:${componentInteraction.customId}`)
+          .setCustomId(`setup_cooldowns_modal:${componentInteraction.id}`)
           .setTitle(`Set ${isReportCooldown ? "report cooldown" : "duplicate report cooldown"}`)
           .addComponents(
             new ActionRowBuilder<TextInputBuilder>().addComponents(
