@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import process from "node:process";
+import { setInterval } from "node:timers";
 
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
@@ -18,7 +19,7 @@ import { AutoPoster } from "topgg-autoposter";
 import { intents } from "./constants/intents.js";
 import { makeCache } from "./constants/makeCache.js";
 import envVarCheck from "./functions/envCheck.js";
-import registerMetrics from "./functions/registerMetrics.js";
+import { cacheStats, registerMetrics } from "./functions/registerMetrics.js";
 import Logger from "./logger.js";
 import * as routes from "./routes.js";
 
@@ -81,6 +82,8 @@ process.on("uncaughtException", (err) => logger.error("Encountered an uncaught e
 
 // Prometheus metrics
 registerMetrics();
+cacheStats();
+setInterval(() => cacheStats(), 30_000);
 
 // Fastify client
 if (env.API_KEY?.length) {

@@ -4,9 +4,35 @@ import { client, prisma } from "../index.js";
 
 // For some very strange reason, this errors:
 // malloc(): unaligned fastbin chunk detected
-// whenever there's more than 9 metrics below.
+// and prisma is related to it, so we are caching it
 
-export default function registerMetrics() {
+let reportCount = 0;
+let messageReportCount = 0;
+let userReportCount = 0;
+let registeredGuildCount = 0;
+let registeredMemberCount = 0;
+let trackerCount = 0;
+let messageTrackerCount = 0;
+let userTrackerCount = 0;
+let voteCount = 0;
+let monthlyVoteCount = 0;
+
+export async function cacheStats() {
+  reportCount = await prisma.report.count();
+  messageReportCount = await prisma.report.count({ where: { type: "Message" } });
+  userReportCount = await prisma.report.count({ where: { type: "User" } });
+  registeredGuildCount = await prisma.guild.count();
+  registeredMemberCount = await prisma.guildMember.count();
+  trackerCount = await prisma.trackedContent.count();
+  messageTrackerCount = await prisma.trackedContent.count({ where: { type: "Message" } });
+  userTrackerCount = await prisma.trackedContent.count({ where: { type: "User" } });
+  voteCount = await prisma.vote.count();
+  monthlyVoteCount = await prisma.vote.count({
+    where: { createdAt: { gte: new Date(new Date().setDate(new Date().getDate() - 30)) } },
+  });
+}
+
+export function registerMetrics() {
   prometheus.collectDefaultMetrics({ prefix: "reindeer_" });
 
   const metrics = [
@@ -38,106 +64,102 @@ export default function registerMetrics() {
         this.set(client.channels.cache.size);
       },
     }),
-    // new prometheus.Gauge({
-    //   name: "reindeer_cached_messages_count",
-    //   help: "The total number of messages the bot has cached.",
-    //   async collect() {
-    //     this.set(
-    //       client.channels.cache.reduce(
-    //         (acc, channel) => acc + ("messages" in channel ? channel.messages.cache.size : 0),
-    //         0,
-    //       ),
-    //     );
-    //   },
-    // }),
-    // new prometheus.Gauge({
-    //   name: "reindeer_cached_users_count",
-    //   help: "The total number of users the bot has cached.",
-    //   async collect() {
-    //     this.set(client.users.cache.size);
-    //   },
-    // }),
-    // new prometheus.Gauge({
-    //   name: "reindeer_cached_members_count",
-    //   help: "The total number of members the bot has cached.",
-    //   async collect() {
-    //     this.set(client.guilds.cache.reduce((acc, guild) => acc + guild.members.cache.size, 0));
-    //   },
-    // }),
+    new prometheus.Gauge({
+      name: "reindeer_cached_messages_count",
+      help: "The total number of messages the bot has cached.",
+      async collect() {
+        this.set(
+          client.channels.cache.reduce(
+            (acc, channel) => acc + ("messages" in channel ? channel.messages.cache.size : 0),
+            0,
+          ),
+        );
+      },
+    }),
+    new prometheus.Gauge({
+      name: "reindeer_cached_users_count",
+      help: "The total number of users the bot has cached.",
+      async collect() {
+        this.set(client.users.cache.size);
+      },
+    }),
+    new prometheus.Gauge({
+      name: "reindeer_cached_members_count",
+      help: "The total number of members the bot has cached.",
+      async collect() {
+        this.set(client.guilds.cache.reduce((acc, guild) => acc + guild.members.cache.size, 0));
+      },
+    }),
     new prometheus.Gauge({
       name: "reindeer_report_count",
       help: "The total number of reports.",
       async collect() {
-        this.set(await prisma.report.count());
+        this.set(reportCount);
       },
     }),
-    // new prometheus.Gauge({
-    //   name: "reindeer_message_report_count",
-    //   help: "The total number of message reports.",
-    //   async collect() {
-    //     this.set(await prisma.report.count({ where: { type: "Message" } }));
-    //   },
-    // }),
-    // new prometheus.Gauge({
-    //   name: "reindeer_user_report_count",
-    //   help: "The total number of user reports.",
-    //   async collect() {
-    //     this.set(await prisma.report.count({ where: { type: "User" } }));
-    //   },
-    // }),
+    new prometheus.Gauge({
+      name: "reindeer_message_report_count",
+      help: "The total number of message reports.",
+      async collect() {
+        this.set(messageReportCount);
+      },
+    }),
+    new prometheus.Gauge({
+      name: "reindeer_user_report_count",
+      help: "The total number of user reports.",
+      async collect() {
+        this.set(userReportCount);
+      },
+    }),
     new prometheus.Gauge({
       name: "reindeer_registered_guild_count",
       help: "The total number of registered guilds.",
       async collect() {
-        this.set(await prisma.guild.count());
+        this.set(registeredGuildCount);
       },
     }),
     new prometheus.Gauge({
       name: "reindeer_registered_member_count",
       help: "The total number of registered guild members.",
       async collect() {
-        this.set(await prisma.guildMember.count());
+        this.set(registeredMemberCount);
       },
     }),
     new prometheus.Gauge({
       name: "reindeer_tracker_count",
       help: "The total number of trackers.",
       async collect() {
-        this.set(await prisma.trackedContent.count());
+        this.set(trackerCount);
       },
     }),
-    // new prometheus.Gauge({
-    //   name: "reindeer_message_tracker_count",
-    //   help: "The total number of message trackers.",
-    //   async collect() {
-    //     this.set(await prisma.trackedContent.count({ where: { type: "Message" } }));
-    //   },
-    // }),
-    // new prometheus.Gauge({
-    //   name: "reindeer_user_tracker_count",
-    //   help: "The total number of user trackers.",
-    //   async collect() {
-    //     this.set(await prisma.trackedContent.count({ where: { type: "User" } }));
-    //   },
-    // }),
+    new prometheus.Gauge({
+      name: "reindeer_message_tracker_count",
+      help: "The total number of message trackers.",
+      async collect() {
+        this.set(messageTrackerCount);
+      },
+    }),
+    new prometheus.Gauge({
+      name: "reindeer_user_tracker_count",
+      help: "The total number of user trackers.",
+      async collect() {
+        this.set(userTrackerCount);
+      },
+    }),
     new prometheus.Gauge({
       name: "reindeer_votes_count",
       help: "The total number of Top.gg votes.",
       async collect() {
-        this.set(await prisma.vote.count());
+        this.set(voteCount);
       },
     }),
-    // new prometheus.Gauge({
-    //   name: "reindeer_monthly_votes_count",
-    //   help: "The monthly count of Top.gg votes.",
-    //   async collect() {
-    //     this.set(
-    //       await prisma.vote.count({
-    //         where: { createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) } },
-    //       }),
-    //     );
-    //   },
-    // }),
+    new prometheus.Gauge({
+      name: "reindeer_monthly_votes_count",
+      help: "The monthly count of Top.gg votes.",
+      async collect() {
+        this.set(monthlyVoteCount);
+      },
+    }),
   ];
 
   for (const metric of metrics) prometheus.register.registerMetric(metric);
