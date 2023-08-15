@@ -14,6 +14,9 @@ export class TrackingGuildMemberRemoveListener extends Listener {
     });
   }
   public async run(member: GuildMember) {
+    // This event sometimes invokes even though the member has never left.
+    if (await member.fetch().catch(() => undefined)) return;
+
     const trackers = await prisma.trackedContent.findMany({
       where: { type: "User", contentId: member.id },
       include: { report: true },

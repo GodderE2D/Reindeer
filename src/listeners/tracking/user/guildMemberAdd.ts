@@ -14,6 +14,9 @@ export class TrackingGuildMemberAddListener extends Listener {
     });
   }
   public async run(member: GuildMember) {
+    // This event sometimes invokes even though the member has never re-joined.
+    if ((member.joinedTimestamp ?? Infinity) < Date.now() - 60_000) return;
+
     const trackers = await prisma.trackedContent.findMany({
       where: { type: "User", contentId: member.id },
       include: { report: true },
