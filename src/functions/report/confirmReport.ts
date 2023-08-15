@@ -51,6 +51,7 @@ export async function confirmReport(
 
   let confirmMessage = guildData[message ? "messageReportConfirmMessage" : "userReportConfirmMessage"];
   confirmMessage = formatConfirmMessage(
+    2000,
     modalResponse.fields.fields.map((f) => f.value),
     confirmMessage,
     target.id,

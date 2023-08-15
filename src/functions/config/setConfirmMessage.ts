@@ -33,8 +33,8 @@ export async function setConfirmMessage(
 ): Promise<{ messageReportMsg: string; userReportMsg: string }> {
   function setEmbedFields(embed: EmbedBuilder) {
     return embed.setFields(
-      { name: "Message reports", value: formatConfirmMessage(EXMAPLE_FIELDS, messageReportMsg, userId, message) },
-      { name: "User reports", value: formatConfirmMessage(EXMAPLE_FIELDS, userReportMsg, userId) },
+      { name: "Message reports", value: formatConfirmMessage(1024, EXMAPLE_FIELDS, messageReportMsg, userId, message) },
+      { name: "User reports", value: formatConfirmMessage(1024, EXMAPLE_FIELDS, userReportMsg, userId) },
     );
   }
 

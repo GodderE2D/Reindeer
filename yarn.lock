@@ -269,7 +269,7 @@
   dependencies:
     debug "^4.3.1"
 
-"@prisma/client@^5.0.0":
+"@prisma/client@^5.1.1":
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/@prisma/client/-/client-5.1.1.tgz#ea2b0c8599bdb3f86d92e8df46fba795a744db01"
   integrity sha512-fxcCeK5pMQGcgCqCrWsi+I2rpIbk0rAhdrN+ke7f34tIrgPwA68ensrpin+9+fZvuV2OtzHmuipwduSY6HswdA==
@@ -2087,7 +2087,7 @@ prettier@^3.0.0:
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.0.1.tgz#65271fc9320ce4913c57747a70ce635b30beaa40"
   integrity sha512-fcOWSnnpCrovBsmFZIGIy9UqK2FaI7Hqax+DIO0A9UxeVoY4iweyaFjS5TavZN97Hfehph0nhsZnjlVKzEQSrQ==
 
-prisma@^5.0.0:
+prisma@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/prisma/-/prisma-5.1.1.tgz#8f5c0f9467a828746cb94f846d694dc7b7481a9e"
   integrity sha512-WJFG/U7sMmcc6TjJTTifTfpI6Wjoh55xl4AzopVwAdyK68L9/ogNo8QQ2cxuUjJf/Wa82z/uhyh3wMzvRIBphg==

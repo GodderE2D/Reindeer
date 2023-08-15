@@ -30,8 +30,8 @@ function formatFields(fields: Field[]) {
     value: [
       field.placeholder ? `**Placeholder**: ${field.placeholder}` : null,
       `**Style**: ${field.style === 1 ? "Short" : "Paragraph"}`,
-      field.min ? `**Min Length**: ${field.min}` : null,
-      field.max ? `**Max Length**: ${field.max}` : null,
+      `**Min Length**: ${field.min || "This field is optional"}`,
+      `**Max Length**: ${field.max}`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -155,8 +155,8 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
               new TextInputBuilder()
                 .setCustomId(`setup_field_min`)
                 .setLabel("Minimum length")
-                .setValue(field ? `${field.min}` : "0")
-                .setPlaceholder("A number (minimum 0, maximum 4000)")
+                .setValue(field ? `${field.min}` : "1")
+                .setPlaceholder("A number (max. 1024, 0 for optional, 1+ for required)")
                 .setStyle(TextInputStyle.Short)
                 .setMinLength(1)
                 .setMaxLength(4),
@@ -165,8 +165,8 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
               new TextInputBuilder()
                 .setCustomId(`setup_field_max`)
                 .setLabel("Maximum length")
-                .setValue(field ? `${field.max}` : "4000")
-                .setPlaceholder("A number (minimum 1, maximum 4000)")
+                .setValue(field ? `${field.max}` : "1024")
+                .setPlaceholder("A number (min. 1, max. 1024)")
                 .setStyle(TextInputStyle.Short)
                 .setMinLength(1)
                 .setMaxLength(4),
@@ -193,17 +193,18 @@ export async function setFields(message: Message<true>, userId: Snowflake, field
         }
 
         const min = parseInt(modalInteraction.fields.getTextInputValue("setup_field_min"));
-        if (min < 0 || min > 4000) {
+        if (min < 0 || min > 1024) {
           return void modalInteraction.reply({
-            content: "The minimum length must be (or between) 0 and 4000.",
+            content:
+              "The minimum length must be (or between) 0 and 1024. Enter 0 if you want the field to be optional.",
             ephemeral: true,
           });
         }
 
         const max = parseInt(modalInteraction.fields.getTextInputValue("setup_field_max"));
-        if (max < 1 || max > 4000) {
+        if (max < 1 || max > 1024) {
           return void modalInteraction.reply({
-            content: "The maximum length must be (or between) 1 and 4000.",
+            content: "The maximum length must be (or between) 1 and 1024.",
             ephemeral: true,
           });
         }

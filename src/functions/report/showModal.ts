@@ -29,7 +29,7 @@ export async function showModal(
       .setStyle(style)
       .setMinLength(min)
       .setMaxLength(max)
-      .setRequired();
+      .setRequired(!!min); // if minimum is 0 then it's optional
 
     modal.addComponents(new ActionRowBuilder<TextInputBuilder>().addComponents(input));
   }

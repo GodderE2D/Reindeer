@@ -68,7 +68,7 @@ export async function createForumPost(
   forumEmbed.addFields(
     guildData.fieldNames.map((fieldName, index) => ({
       name: `${index + 1}. ${fieldName}`,
-      value: modalResponse.fields.fields.at(index)?.value ?? "*No response.*",
+      value: modalResponse.fields.fields.at(index)?.value || "*No response.*",
     })),
   );
 
