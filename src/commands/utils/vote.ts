@@ -52,7 +52,7 @@ export class VoteCommand extends Command {
         ].join("\n"),
       )
       .addFields({
-        name: `Your voting history (${votes.length}/${votes.length > 10 ? "10" : votes.length} shown)`,
+        name: `Your voting history (${votes.length > 10 ? "10" : votes.length}/${votes.length} shown)`,
         value:
           votes
             .slice(0, 10)
