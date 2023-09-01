@@ -105,8 +105,7 @@ if (env.API_KEY?.length) {
 
   fastify.listen({ port: parseInt(env.API_PORT || "3000"), host: "0.0.0.0" }, (error, address) => {
     if (error) {
-      logger.error("An error occurred when trying to initialise the API:", error);
-      process.exit(1);
+      return logger.error("An error occurred when trying to initialise the API:", error);
     }
 
     logger.info(`API server listening at ${address}.`);
