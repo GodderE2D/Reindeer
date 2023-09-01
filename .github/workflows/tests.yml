@@ -32,3 +32,6 @@ jobs:
 
       - name: Run Prettier
         run: yarn format:check
+
+      - name: Run Prisma Validate
+        run: yarn validate

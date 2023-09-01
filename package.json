@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node .",
     "dev": "nodemon",
-    "test": "yarn build:ci && yarn lint:check && yarn format:check",
-    "test:fix": "yarn build:ci && yarn lint && yarn format",
+    "test": "yarn build:ci && yarn lint:check && yarn format:check && yarn validate",
+    "test:fix": "yarn build:ci && yarn lint && yarn format && yarn format:prisma",
     "build": "tsc && yarn run sentry:sourcemaps",
     "build:ci": "tsc",
     "build:dev": "tsc --watch",
@@ -17,6 +17,8 @@
     "lint:check": "eslint .",
     "format": "prettier .",
     "format:check": "prettier --check .",
+    "format:prisma": "prisma format",
+    "validate": "prisma validate",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org blue-shark-river --project reindeer ./dist && sentry-cli sourcemaps upload --org blue-shark-river --project reindeer ./dist"
   },
   "repository": {
@@ -31,7 +33,7 @@
   "homepage": "https://reindeer.bsr.gg/",
   "type": "module",
   "engines": {
-    "node": ">=16.9.0"
+    "node": ">=16.11.0"
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma"
@@ -39,33 +41,33 @@
   "dependencies": {
     "@fastify/cors": "^8.3.0",
     "@fastify/helmet": "^11.0.0",
-    "@prisma/client": "^5.1.1",
-    "@sapphire/framework": "^4.5.0",
-    "@sapphire/plugin-subcommands": "^4.0.1",
-    "@sapphire/utilities": "^3.12.0",
-    "@sentry/node": "^7.61.1",
+    "@prisma/client": "^5.2.0",
+    "@sapphire/framework": "^4.5.3",
+    "@sapphire/plugin-subcommands": "^4.2.1",
+    "@sapphire/utilities": "^3.13.0",
+    "@sentry/node": "^7.66.0",
     "dayjs": "^1.11.9",
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
-    "fastify": "^4.19.2",
+    "fastify": "^4.22.2",
     "ms": "^2.1.3",
     "pm2": "^5.3.0",
     "prom-client": "^14.2.0",
     "topgg-autoposter": "^2.0.1",
-    "zod": "^3.21.4"
+    "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@types/node": "^20.4.0",
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
-    "@typescript-eslint/parser": "^5.61.0",
-    "eslint": "^8.44.0",
-    "eslint-config-prettier": "^8.8.0",
+    "@types/node": "^20.5.8",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "eslint": "^8.48.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "nodemon": "^2.0.22",
-    "prettier": "^3.0.0",
-    "prettier-plugin-prisma": "^4.13.0",
-    "prisma": "^5.1.1",
-    "typescript": "^5.1.6"
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3",
+    "prettier-plugin-prisma": "^5.0.0",
+    "prisma": "^5.2.0",
+    "typescript": "^5.2.2"
   },
   "packageManager": "yarn@1.22.19"
 }
