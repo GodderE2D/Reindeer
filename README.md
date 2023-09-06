@@ -13,7 +13,7 @@
     <img src="https://img.shields.io/discord/983301648829001768?color=5865F2&logo=discord&logoColor=white" alt="Support Server" />
   </a>
   <a href="https://github.com/GodderE2D/Reindeer/actions">
-    <img src="https://github.com/discordjs/discord.js/actions/workflows/tests.yml/badge.svg" alt="CI Tests Status" />
+    <img src="https://github.com/GodderE2D/Reindeer/actions/workflows/tests.yml/badge.svg" alt="CI Tests Status" />
   </a>
   <a href="https://github.com/sponsors/GodderE2D">
     <img src="https://img.shields.io/badge/sponsor-GodderE2D-ea4aaa?logo=github&logoColor=white" alt="GitHub Sponsors" />
