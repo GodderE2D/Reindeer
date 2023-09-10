@@ -18,7 +18,7 @@
     "format": "prettier .",
     "format:check": "prettier --check .",
     "format:prisma": "prisma format",
-    "validate": "prisma validate",
+    "validate": "DB_CONNECTION_URL=postgres:// prisma validate",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org blue-shark-river --project reindeer ./dist && sentry-cli sourcemaps upload --org blue-shark-river --project reindeer ./dist"
   },
   "repository": {
