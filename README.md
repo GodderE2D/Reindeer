@@ -38,7 +38,8 @@ To see a full list of features, documentation, and to invite the bot visit https
 
 # Installing
 
-> **Note:** If you just want to use the publicly hosted version of the bot, you can invite it from
+> [!NOTE]  
+> If you just want to use the publicly hosted version of the bot, you can invite it from
 > [the website](https://reindeer.bsr.gg/).
 
 To locally install the bot yourself (e.g. if you want to contribute or self-host), follow these steps:
