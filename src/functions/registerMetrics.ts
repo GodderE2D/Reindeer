@@ -38,7 +38,7 @@ export function registerMetrics() {
   const metrics = [
     new prometheus.Gauge({
       name: "reindeer_ws_ping",
-      help: "The webscoket ping of the bot.",
+      help: "The websocket ping of the bot.",
       async collect() {
         this.set(client.ws.ping);
       },
