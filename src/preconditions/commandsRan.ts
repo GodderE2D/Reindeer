@@ -1,7 +1,7 @@
 import { AllFlowsPrecondition, Piece } from "@sapphire/framework";
 import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from "discord.js";
 
-import { commandsRan } from "../index.js";
+import { commandsRan, env } from "../index.js";
 
 export class CommandsRanPrecondition extends AllFlowsPrecondition {
   public constructor(context: Piece.Context, options: AllFlowsPrecondition.Options) {
@@ -12,7 +12,9 @@ export class CommandsRanPrecondition extends AllFlowsPrecondition {
   }
 
   private addCommand(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction) {
-    commandsRan.set(interaction.id, { createdAt: new Date(), name: interaction.commandName });
+    if (interaction.guildId !== env.DEVELOPMENT_GUILD_ID) {
+      commandsRan.set(interaction.id, { createdAt: new Date(), name: interaction.commandName });
+    }
 
     return this.ok();
   }
