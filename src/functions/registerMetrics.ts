@@ -1,6 +1,6 @@
 import prometheus from "prom-client";
 
-import { client, prisma } from "../index.js";
+import { client, commandsRan, prisma } from "../index.js";
 
 // For some very strange reason, this errors:
 // malloc(): unaligned fastbin chunk detected
@@ -62,6 +62,13 @@ export function registerMetrics() {
       help: "The total number of channels in all guilds the bot is in.",
       async collect() {
         this.set(client.channels.cache.size);
+      },
+    }),
+    new prometheus.Gauge({
+      name: "reindeer_daily_command_count",
+      help: "The total number of commands ran in the past 24 hours.",
+      async collect() {
+        this.set(commandsRan.filter(({ createdAt }) => createdAt.getTime() > Date.now() - 86_400_000).size);
       },
     }),
     new prometheus.Gauge({
