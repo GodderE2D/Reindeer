@@ -38,7 +38,11 @@ function formatFields(fields: Field[]) {
   }));
 }
 
-export async function setFields(message: Message<true>, userId: Snowflake, fields = DEFAULT_FIELDS): Promise<Field[]> {
+export async function setFields(
+  message: Message<true>,
+  userId: Snowflake,
+  fields = DEFAULT_FIELDS.slice(),
+): Promise<Field[]> {
   function createMenuRow(fields: Field[], editOrDelete: "edit" | "delete") {
     const options: SelectMenuComponentOptionData[] = [
       ...fields.map((field, index) => ({
