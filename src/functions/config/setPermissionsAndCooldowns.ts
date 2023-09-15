@@ -105,7 +105,7 @@ export async function setPermissionsAndCooldowns(
 
   collector.on("end", async () => {
     if (collector.endReason !== "time") return;
-    await message.edit({ content: "You took too long to respond.", embeds: [], components: [] });
+    await message.edit({ content: "You took too long to respond.", embeds: [], components: [] }).catch(() => undefined);
   });
 
   return new Promise((resolve) => {

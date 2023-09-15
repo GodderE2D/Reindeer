@@ -58,10 +58,12 @@ export async function setChannel(originalMessage: Message<true>, userId: Snowfla
     })
     .catch(
       async () =>
-        void (await message.edit({
-          content: "You took too long to respond.",
-          components: [disableComponents(menuRow), disableComponents(buttonRow)],
-        })),
+        void (await message
+          .edit({
+            content: "You took too long to respond.",
+            components: [disableComponents(menuRow), disableComponents(buttonRow)],
+          })
+          .catch(() => undefined)),
     );
 
   if (!componentInteraction) return;
