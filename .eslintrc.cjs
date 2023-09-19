@@ -11,7 +11,8 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "simple-import-sort"],
   rules: {
-    "no-unused-vars": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "no-unused-vars": "off",
     "no-var": "error",
     "no-console": "error",
     "no-warning-comments": "warn",
