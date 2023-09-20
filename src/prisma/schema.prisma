@@ -109,6 +109,13 @@ model TrackedContent {
   @@map("tracked_message")
 }
 
+model BotBlacklist {
+  id        String           @id
+  createdAt DateTime         @default(now()) @map("created_at")
+  type      BotBlacklistType
+  reason    String
+}
+
 model Vote {
   id        String   @id @default(cuid())
   userId    String   @map("user_id")
@@ -124,4 +131,9 @@ enum ReportStatus {
   Open
   Approved
   Rejected
+}
+
+enum BotBlacklistType {
+  User
+  Guild
 }

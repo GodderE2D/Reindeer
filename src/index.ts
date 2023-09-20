@@ -18,6 +18,7 @@ import { AutoPoster } from "topgg-autoposter";
 
 import { intents } from "./constants/intents.js";
 import { makeCache } from "./constants/makeCache.js";
+import { fetchBotBlacklist } from "./functions/botBlacklistCache.js";
 import envVarCheck from "./functions/envCheck.js";
 import { cacheStats, registerMetrics } from "./functions/registerMetrics.js";
 import Logger from "./logger.js";
@@ -75,6 +76,11 @@ if (env.NODE_ENV === "production" && env.TOPGG_TOKEN?.length) {
 
 // Create collections
 export const commandsRan = new Collection<Snowflake, { createdAt: Date; name: string }>();
+
+// Bot blacklist cache
+export const botBlacklistCache = new Set<string>();
+fetchBotBlacklist(botBlacklistCache);
+setInterval(() => fetchBotBlacklist(botBlacklistCache), 30_000); // Fallback in case of a change outside of the process
 
 // Catch uncaught errors
 process.on("unhandledRejection", (err) => logger.error("Encountered an unhandled promise rejection:", err));
