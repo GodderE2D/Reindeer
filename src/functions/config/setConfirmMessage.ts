@@ -14,10 +14,10 @@ import {
 import colours from "../../constants/colours.js";
 import { formatConfirmMessage } from "../formatConfirmMessage.js";
 
-const DEFAULT_MESSAGE_REPORT_MSG = `Are you sure you want to report [this message]({{message}}) to the server moderators?\n**Reason**: {{field1}}`;
-const DEFAULT_USER_REPORT_MSG = `Are you sure you want to report {{user}} to the server moderators?\n**Reason**: {{field1}}`;
+export const DEFAULT_MESSAGE_REPORT_MSG = `Are you sure you want to report [this message]({{message}}) to the server moderators?\n**Reason**: {{field1}}`;
+export const DEFAULT_USER_REPORT_MSG = `Are you sure you want to report {{user}} to the server moderators?\n**Reason**: {{field1}}`;
 
-const EXMAPLE_FIELDS = [
+const EXAMPLE_FIELDS = [
   "Example response",
   "Example response",
   "Example response",
@@ -33,8 +33,8 @@ export async function setConfirmMessage(
 ): Promise<{ messageReportMsg: string; userReportMsg: string }> {
   function setEmbedFields(embed: EmbedBuilder) {
     return embed.setFields(
-      { name: "Message reports", value: formatConfirmMessage(1024, EXMAPLE_FIELDS, messageReportMsg, userId, message) },
-      { name: "User reports", value: formatConfirmMessage(1024, EXMAPLE_FIELDS, userReportMsg, userId) },
+      { name: "Message reports", value: formatConfirmMessage(1024, EXAMPLE_FIELDS, messageReportMsg, userId, message) },
+      { name: "User reports", value: formatConfirmMessage(1024, EXAMPLE_FIELDS, userReportMsg, userId) },
     );
   }
 
@@ -46,7 +46,7 @@ export async function setConfirmMessage(
     })
     .setTitle("Configure your confirmation messages")
     .setDescription(
-      "After your members complete the questions you entered before, Reindeer will send a confirmation message before actually submitting the report. Below is a preivew of your confirmation messages.",
+      "After your members complete the questions you entered before, Reindeer will send a confirmation message before actually submitting the report. Below is a preview of your confirmation messages.",
     );
 
   const tipEmbed = new EmbedBuilder()

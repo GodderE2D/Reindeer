@@ -3,9 +3,8 @@ import { EmbedBuilder, PermissionFlagsBits } from "discord.js";
 
 import colours from "../../constants/colours.js";
 import { setChannel } from "../../functions/config/setChannel.js";
-import { setConfirmMessage } from "../../functions/config/setConfirmMessage.js";
-import { setFields } from "../../functions/config/setFields.js";
-import { setPermissionsAndCooldowns } from "../../functions/config/setPermissionsAndCooldowns.js";
+import { DEFAULT_MESSAGE_REPORT_MSG, DEFAULT_USER_REPORT_MSG } from "../../functions/config/setConfirmMessage.js";
+import { DEFAULT_FIELDS } from "../../functions/config/setFields.js";
 import { prisma } from "../../index.js";
 
 export class SetupChatInputCommand extends Command {
@@ -13,7 +12,7 @@ export class SetupChatInputCommand extends Command {
     super(context, {
       ...options,
       name: "setup",
-      description: "Setup Reindeer in this server.",
+      description: "Setup Reindeer in this server. Note: This will send a message in the current channel.",
     });
   }
 
@@ -35,7 +34,10 @@ export class SetupChatInputCommand extends Command {
     const existingGuild = await prisma.guild.findUnique({ where: { guildId: interaction.guild.id } });
 
     if (existingGuild) {
-      return interaction.reply({ content: "Reindeer is already setup in this server.", ephemeral: true });
+      return interaction.reply({
+        content: "Reindeer is already setup in this server. Use one of the `/config` commands instead.",
+        ephemeral: true,
+      });
     }
 
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
@@ -58,13 +60,6 @@ export class SetupChatInputCommand extends Command {
     const { channel, createdTags } = (await setChannel(message, interaction.user.id)) ?? {};
     if (!channel || !createdTags) return;
 
-    const fields = await setFields(message, interaction.user.id);
-
-    const { messageReportMsg, userReportMsg } = await setConfirmMessage(message, interaction.user.id);
-
-    const { disallowedTargetRoles, cooldownBypassRoles, reportCooldown, duplicateReportCooldown } =
-      await setPermissionsAndCooldowns(message, interaction.user.id);
-
     await prisma.guild.create({
       data: {
         guildId: interaction.guild.id,
@@ -76,36 +71,44 @@ export class SetupChatInputCommand extends Command {
         approvedTagId: createdTags.approved?.id ?? "",
         rejectedTagId: createdTags.rejected?.id ?? "",
 
-        fieldNames: fields.map((field) => field.name),
-        fieldPlaceholders: fields.map((field) => field.placeholder ?? ""),
-        fieldStyles: fields.map((field) => field.style),
-        fieldMins: fields.map((field) => field.min),
-        fieldMaxes: fields.map((field) => field.max),
+        fieldNames: DEFAULT_FIELDS.map((field) => field.name),
+        fieldPlaceholders: DEFAULT_FIELDS.map((field) => field.placeholder ?? ""),
+        fieldStyles: DEFAULT_FIELDS.map((field) => field.style),
+        fieldMins: DEFAULT_FIELDS.map((field) => field.min),
+        fieldMaxes: DEFAULT_FIELDS.map((field) => field.max),
 
-        messageReportConfirmMessage: messageReportMsg,
-        userReportConfirmMessage: userReportMsg,
+        messageReportConfirmMessage: DEFAULT_MESSAGE_REPORT_MSG,
+        userReportConfirmMessage: DEFAULT_USER_REPORT_MSG,
 
-        disallowedTargetRoles: disallowedTargetRoles,
-        reportCooldown: reportCooldown,
-        duplicateReportCooldown: duplicateReportCooldown,
-        reportCooldownBypassRoles: cooldownBypassRoles,
+        disallowedTargetRoles: [],
+        reportCooldown: 0,
+        duplicateReportCooldown: 0,
+        reportCooldownBypassRoles: [],
       },
     });
 
     const embed = new EmbedBuilder()
       .setColor(colours.primary)
+      .setImage("https://reindeer.bsr.gg/report-message-command.png")
       .setAuthor({
         name: "Reindeer Setup",
         iconURL: "https://cdn.discordapp.com/avatars/1126157327746211840/0cdcb588f96ec9cfc5d4f9685c8987f4.webp",
       })
       .setTitle("Reindeer has been setup in this server 🎉")
-      .setDescription(
-        "Congratulations! Reindeer has now been setup in this server. Members can now use the right-click context menu or `/report` to report messages and users.",
-      )
+      .setDescription("Members can now use the right-click context menu or `/report` to report messages and users.")
       .addFields(
         {
-          name: "Changing settings later",
-          value: "You can use the `/config` command to change any of the settings you entered during the setup.",
+          name: "Configure advanced settings",
+          value: [
+            "**You can use one of the `/config` commands to customise Reindeer further.**",
+            "- Use `/config fields` to change the questions asked when a member creates a report.",
+            "- Use `/config confirmation-message` to change the confirmation message sent before submitting a report.",
+            "- Use `/config permissions-cooldowns` to change permissions and cooldowns for reports.",
+            // "- Use `/config logs` to set where logs will be sent.",
+            // "- Use `/config automod` to enable and change automod settings.",
+            // "- Use `/config global-alert` to enable Global Alert (a global ban system).",
+            "- Use `/config channel` to change the report channel you just set.",
+          ].join("\n"),
         },
         {
           name: "Need help?",
