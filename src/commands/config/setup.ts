@@ -1,6 +1,7 @@
 import { ChatInputCommand, Command } from "@sapphire/framework";
 import { EmbedBuilder, PermissionFlagsBits } from "discord.js";
 
+import { basicAdsRow } from "../../constants/advertisements.js";
 import colours from "../../constants/colours.js";
 import { setChannel } from "../../functions/config/setChannel.js";
 import { DEFAULT_MESSAGE_REPORT_MSG, DEFAULT_USER_REPORT_MSG } from "../../functions/config/setConfirmMessage.js";
@@ -119,7 +120,7 @@ export class SetupChatInputCommand extends Command {
 
     return await message.edit({
       embeds: [embed],
-      components: [],
+      components: [basicAdsRow],
     });
   }
 }

@@ -8,6 +8,7 @@ import {
   messageLink,
 } from "discord.js";
 
+import { basicAdsRow } from "../constants/advertisements.js";
 import colours from "../constants/colours.js";
 import { prisma } from "../index.js";
 
@@ -102,7 +103,9 @@ export async function setReportStatus(
     )
     .setTimestamp();
 
-  await thread.send({ embeds: [notificationEmbed] }).catch(() => undefined);
+  await thread
+    .send({ embeds: [notificationEmbed], components: status !== "Open" ? [basicAdsRow] : [] })
+    .catch(() => undefined);
   await thread.setArchived(status !== "Open");
 
   await prisma.report.update({ where: { id: report.id }, data: { status } });

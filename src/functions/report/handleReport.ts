@@ -9,6 +9,7 @@ import {
   User,
 } from "discord.js";
 
+import { basicAdsRow } from "../../constants/advertisements.js";
 import { prisma } from "../../index.js";
 import { disableComponents } from "../disableComponents.js";
 import { checkUserPermissions } from "./checkUserPermissions.js";
@@ -89,6 +90,6 @@ export async function handleReport(
 
   return await confirmResponse.edit({
     content: "Your report has been submitted. Thank you!",
-    components: [disableComponents(confirmRow)],
+    components: [basicAdsRow],
   });
 }
