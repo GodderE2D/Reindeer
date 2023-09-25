@@ -22,7 +22,9 @@ export type Field = {
   max: number;
 };
 
-const DEFAULT_FIELDS: Field[] = [{ name: "Reason for the report", placeholder: null, style: 2, min: 1, max: 1024 }];
+export const DEFAULT_FIELDS: Field[] = [
+  { name: "Reason for the report", placeholder: null, style: 2, min: 1, max: 1024 },
+];
 
 function formatFields(fields: Field[]) {
   return fields.map((field, index) => ({
