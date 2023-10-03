@@ -53,10 +53,10 @@ model Guild {
   duplicateReportCooldown   Int      @map("duplicate_report_cooldown") // in seconds
   reportCooldownBypassRoles String[] @map("report_cooldown_bypass_roles")
 
-  authorFeedbackEnabled         Boolean @default(false) @map("author_feedback_enabled")
-  authorFeedbackAutoSend        Boolean @default(true) @map("author_feedback_auto_send") // whether to send feedback automatically after closing
-  authorFeedbackApprovedMessage String  @default("You recently reported {{user}} for \"{{field1}}\" {{time}}. Your report has been reviewed and appropriate action has been taken. Thank you!") @map("author_feedback_approved_message")
-  authorFeedbackRejectedMessage String  @default("You recently reported {{user}} for \"{{field1}}\" {{time}}. Your report has been reviewed and it has been determined that no action is necessary.") @map("author_feedback_rejected_message")
+  authorFeedbackEnabled         Boolean @default(true) @map("author_feedback_enabled")
+  authorFeedbackAutoSend        Boolean @default(false) @map("author_feedback_auto_send") // whether to send feedback automatically after closing
+  authorFeedbackApprovedMessage String  @map("author_feedback_approved_message")
+  authorFeedbackRejectedMessage String  @map("author_feedback_rejected_message")
 
   @@map("guild")
 }
