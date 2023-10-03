@@ -5,6 +5,7 @@ import { basicAdsRow } from "../../constants/advertisements.js";
 import colours from "../../constants/colours.js";
 import { setChannel } from "../../functions/config/setChannel.js";
 import { DEFAULT_MESSAGE_REPORT_MSG, DEFAULT_USER_REPORT_MSG } from "../../functions/config/setConfirmMessage.js";
+import { DEFAULT_FEEDBACK_APPROVED_MSG, DEFAULT_FEEDBACK_REJECTED_MSG } from "../../functions/config/setFeedback.js";
 import { DEFAULT_FIELDS } from "../../functions/config/setFields.js";
 import { prisma } from "../../index.js";
 
@@ -85,6 +86,9 @@ export class SetupChatInputCommand extends Command {
         reportCooldown: 0,
         duplicateReportCooldown: 0,
         reportCooldownBypassRoles: [],
+
+        authorFeedbackApprovedMessage: DEFAULT_FEEDBACK_APPROVED_MSG,
+        authorFeedbackRejectedMessage: DEFAULT_FEEDBACK_REJECTED_MSG,
       },
     });
 
