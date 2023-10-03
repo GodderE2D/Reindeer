@@ -11,13 +11,14 @@ import {
 import { basicAdsRow } from "../constants/advertisements.js";
 import colours from "../constants/colours.js";
 import { prisma } from "../index.js";
+import { sendFeedback } from "./sendFeedback.js";
 
 export async function setReportStatus(
   status: "Open" | "Approved" | "Rejected",
   number: number,
   interaction: ChatInputCommandInteraction<"cached"> | ButtonInteraction<"cached">,
 ) {
-  const report = await prisma.report.findUnique({
+  let report = await prisma.report.findUnique({
     where: {
       number_guildId: { number, guildId: interaction.guild.id },
     },
@@ -103,13 +104,35 @@ export async function setReportStatus(
     )
     .setTimestamp();
 
-  await thread
-    .send({ embeds: [notificationEmbed], components: status !== "Open" ? [basicAdsRow] : [] })
-    .catch(() => undefined);
+  const authorFeedbackRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`send_feedback:${report.number}`)
+      .setLabel("Send feedback to author")
+      .setStyle(ButtonStyle.Primary),
+  );
+
+  const components = [];
+  if (
+    report.guild.authorFeedbackEnabled &&
+    !report.guild.authorFeedbackAutoSend &&
+    !report.reportFeedbackSent &&
+    status !== "Open"
+  ) {
+    components.push(authorFeedbackRow);
+  }
+  if (status !== "Open") components.push(basicAdsRow);
+
+  await thread.send({ embeds: [notificationEmbed], components }).catch(() => undefined);
   await thread.setArchived(status !== "Open");
 
-  await prisma.report.update({ where: { id: report.id }, data: { status } });
+  report = await prisma.report.update({ where: { id: report.id }, data: { status }, include: { guild: true } });
   if (status !== "Open") await prisma.trackedContent.deleteMany({ where: { reportId: report.id } });
+
+  if (status !== "Open" && report.guild.authorFeedbackEnabled && report.guild.authorFeedbackAutoSend) {
+    const author = await interaction.client.users.fetch(report.authorId).catch(() => undefined);
+    if (!author) return;
+    await sendFeedback(report, author, interaction.member);
+  }
 
   return true;
 }
