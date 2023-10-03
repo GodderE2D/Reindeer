@@ -25,12 +25,11 @@ model GuildMember {
 }
 
 model Guild {
-  guildId               String        @id @map("guild_id")
-  createdAt             DateTime      @default(now()) @map("created_at")
-  members               GuildMember[]
-  reports               Report[]
-  forumChannelId        String        @map("forum_channel_id")
-  authorFeedbackEnabled Boolean       @default(false) @map("author_feedback_enabled")
+  guildId        String        @id @map("guild_id")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  members        GuildMember[]
+  reports        Report[]
+  forumChannelId String        @map("forum_channel_id")
 
   messageTagId  String @map("message_tag_id")
   userTagId     String @map("user_tag_id")
@@ -53,6 +52,11 @@ model Guild {
   reportCooldown            Int      @map("report_cooldown") // in seconds
   duplicateReportCooldown   Int      @map("duplicate_report_cooldown") // in seconds
   reportCooldownBypassRoles String[] @map("report_cooldown_bypass_roles")
+
+  authorFeedbackEnabled         Boolean @default(false) @map("author_feedback_enabled")
+  authorFeedbackAutoSend        Boolean @default(true) @map("author_feedback_auto_send") // whether to send feedback automatically after closing
+  authorFeedbackApprovedMessage String  @default("You recently reported {{user}} for \"{{field1}}\" {{time}}. Your report has been reviewed and appropriate action has been taken. Thank you!") @map("author_feedback_approved_message")
+  authorFeedbackRejectedMessage String  @default("You recently reported {{user}} for \"{{field1}}\" {{time}}. Your report has been reviewed and it has been determined that no action is necessary.") @map("author_feedback_rejected_message")
 
   @@map("guild")
 }
@@ -80,6 +84,8 @@ model Report {
   fieldValues String[] @map("field_values")
 
   trackedContent TrackedContent[]
+
+  reportFeedbackSent Boolean @default(false) @map("report_feedback_sent")
 
   @@unique([number, guildId])
   @@map("report")

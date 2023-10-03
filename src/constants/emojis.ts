@@ -1,41 +1,7 @@
 import { EmojiIdentifierResolvable } from "discord.js";
 
 // Emojis listed here are uploaded to Blue Shark River.
-
-export type Emojis = {
-  success: EmojiIdentifierResolvable;
-  error: EmojiIdentifierResolvable;
-  neutral: EmojiIdentifierResolvable;
-  warn: EmojiIdentifierResolvable;
-  ban: EmojiIdentifierResolvable;
-  kick: EmojiIdentifierResolvable;
-  timeout: EmojiIdentifierResolvable;
-  restrict: EmojiIdentifierResolvable;
-  delete: EmojiIdentifierResolvable;
-  staff: EmojiIdentifierResolvable;
-  authorisation: EmojiIdentifierResolvable;
-  channel: EmojiIdentifierResolvable;
-  clock: EmojiIdentifierResolvable;
-  stageModerator: EmojiIdentifierResolvable;
-  hammer: EmojiIdentifierResolvable;
-  edit: EmojiIdentifierResolvable;
-  person: EmojiIdentifierResolvable;
-  link: EmojiIdentifierResolvable;
-  settings: EmojiIdentifierResolvable;
-  search: EmojiIdentifierResolvable;
-  join: EmojiIdentifierResolvable;
-  leave: EmojiIdentifierResolvable;
-  plus: EmojiIdentifierResolvable;
-  minus: EmojiIdentifierResolvable;
-  emoji: EmojiIdentifierResolvable;
-  discover: EmojiIdentifierResolvable;
-  muted: EmojiIdentifierResolvable;
-  deafened: EmojiIdentifierResolvable;
-  octo: EmojiIdentifierResolvable;
-  lemon: EmojiIdentifierResolvable;
-};
-
-const emojis: Emojis = {
+const emojis = {
   success: "<:_:1012176958777462794>",
   error: "<:_:1012176953060642937>",
   neutral: "<:_:1012176955380084796",
@@ -66,6 +32,8 @@ const emojis: Emojis = {
   deafened: "<:_:1110772810072203345>",
   octo: "<:_:1012179076540280832>",
   lemon: "<:_:1012179274591129643>",
-};
+  onswitch: "<:_:1158543194401808496>",
+  offswitch: "<:_:1158543196289257472>",
+} as const satisfies Record<string, EmojiIdentifierResolvable>;
 
 export default emojis;

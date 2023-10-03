@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { Message, Snowflake, ThreadChannel, User } from "discord.js";
+import { Message, ModalSubmitInteraction, Snowflake, ThreadChannel, User } from "discord.js";
 
 import { prisma } from "../../index.js";
 
@@ -10,6 +10,7 @@ export async function createReportEntry(
   firstMessageId: Snowflake,
   author: User,
   target: User,
+  modalResponse: ModalSubmitInteraction,
   message?: Message,
 ) {
   const trackedContent: Prisma.TrackedContentCreateManyReportInput[] = [
@@ -37,6 +38,7 @@ export async function createReportEntry(
       startMessageId: firstMessageId,
       messageId: message?.id,
       channelId: message?.channel.id,
+      fieldValues: modalResponse.fields.fields.map((f) => f.value),
       trackedContent: { createMany: { data: trackedContent } },
       guild: { connect: { guildId } },
       author: {

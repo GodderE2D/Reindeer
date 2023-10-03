@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 
 import { disableComponents } from "../disableComponents.js";
-import { formatConfirmMessage } from "../formatConfirmMessage.js";
+import { formatConfirmMessage } from "../formatConfigMessages.js";
 
 export async function confirmReport(
   target: User,

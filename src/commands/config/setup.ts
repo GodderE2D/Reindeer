@@ -105,6 +105,7 @@ export class SetupChatInputCommand extends Command {
             "- Use `/config fields` to change the questions asked when a member creates a report.",
             "- Use `/config confirmation-message` to change the confirmation message sent before submitting a report.",
             "- Use `/config permissions-cooldowns` to change permissions and cooldowns for reports.",
+            "- Use `/config feedback` to change author feedback settings.",
             // "- Use `/config logs` to set where logs will be sent.",
             // "- Use `/config automod` to enable and change automod settings.",
             // "- Use `/config global-alert` to enable Global Alert (a global ban system).",

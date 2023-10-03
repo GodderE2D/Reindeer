@@ -79,7 +79,16 @@ export async function handleReport(
   if (!forumPost || !firstMessage) return;
 
   try {
-    await createReportEntry(number, interaction.guild.id, forumPost, firstMessage.id, author.user, target, message);
+    await createReportEntry(
+      number,
+      interaction.guild.id,
+      forumPost,
+      firstMessage.id,
+      author.user,
+      target,
+      modalResponse,
+      message,
+    );
   } catch (err) {
     confirmResponse.edit({
       content: "An error occurred while creating the report. Please try again.",

@@ -12,18 +12,12 @@ import {
 } from "discord.js";
 
 import colours from "../../constants/colours.js";
-import { formatConfirmMessage } from "../formatConfirmMessage.js";
+import { formatConfirmMessage } from "../formatConfigMessages.js";
 
 export const DEFAULT_MESSAGE_REPORT_MSG = `Are you sure you want to report [this message]({{message}}) to the server moderators?\n**Reason**: {{field1}}`;
 export const DEFAULT_USER_REPORT_MSG = `Are you sure you want to report {{user}} to the server moderators?\n**Reason**: {{field1}}`;
 
-const EXAMPLE_FIELDS = [
-  "Example response",
-  "Example response",
-  "Example response",
-  "Example response",
-  "Example response",
-];
+const EXAMPLE_FIELDS = new Array(5).fill("Example response");
 
 export async function setConfirmMessage(
   message: Message<true>,
@@ -46,7 +40,7 @@ export async function setConfirmMessage(
     })
     .setTitle("Configure your confirmation messages")
     .setDescription(
-      "After your members complete the questions you entered before, Reindeer will send a confirmation message before actually submitting the report. Below is a preview of your confirmation messages.",
+      "After your members complete your questions, Reindeer will send a confirmation message before actually submitting the report. Below is a preview of your confirmation messages.",
     );
 
   const tipEmbed = new EmbedBuilder()

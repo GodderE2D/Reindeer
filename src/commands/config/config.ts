@@ -5,6 +5,7 @@ import { EmbedBuilder, PermissionFlagsBits, User } from "discord.js";
 import colours from "../../constants/colours.js";
 import { setChannel } from "../../functions/config/setChannel.js";
 import { setConfirmMessage } from "../../functions/config/setConfirmMessage.js";
+import { setFeedback } from "../../functions/config/setFeedback.js";
 import { Field, setFields } from "../../functions/config/setFields.js";
 import { setPermissionsAndCooldowns } from "../../functions/config/setPermissionsAndCooldowns.js";
 import { prisma } from "../../index.js";
@@ -20,6 +21,7 @@ export class ConfigChatInputCommand extends Subcommand {
         { name: "fields", chatInputRun: "chatInputFields" },
         { name: "confirmation-message", chatInputRun: "chatInputConfirmationMessage" },
         { name: "permissions-cooldowns", chatInputRun: "chatInputPermissionsCooldowns" },
+        { name: "feedback", chatInputRun: "chatInputFeedback" },
       ],
     });
   }
@@ -47,6 +49,9 @@ export class ConfigChatInputCommand extends Subcommand {
             command
               .setName("permissions-cooldowns")
               .setDescription("Configure permissions and cooldowns for this server."),
+          )
+          .addSubcommand((command) =>
+            command.setName("feedback").setDescription("Configure author feedback for this server."),
           ),
       {
         idHints: [],
@@ -203,6 +208,35 @@ export class ConfigChatInputCommand extends Subcommand {
 
     return await message.edit({
       embeds: [this.generateEmbed("Report permissions and cooldowns updated.", interaction.user)],
+      components: [],
+    });
+  }
+
+  public async chatInputFeedback(interaction: Subcommand.ChatInputCommandInteraction<"cached">) {
+    const { message, guild } = (await this.checkPermissionsAndSendMessage(interaction)) ?? {};
+    if (!message || !guild) return;
+
+    const { feedbackApprovedMsg, feedbackRejectedMsg, feedbackEnabled, feedbackAutoSend } = await setFeedback(
+      message,
+      interaction.user.id,
+      guild.authorFeedbackApprovedMessage,
+      guild.authorFeedbackRejectedMessage,
+      guild.authorFeedbackEnabled,
+      guild.authorFeedbackAutoSend,
+    );
+
+    await prisma.guild.update({
+      where: { guildId: interaction.guild.id },
+      data: {
+        authorFeedbackApprovedMessage: feedbackApprovedMsg,
+        authorFeedbackRejectedMessage: feedbackRejectedMsg,
+        authorFeedbackEnabled: feedbackEnabled,
+        authorFeedbackAutoSend: feedbackAutoSend,
+      },
+    });
+
+    return await message.edit({
+      embeds: [this.generateEmbed("Author feedback settings updated.", interaction.user)],
       components: [],
     });
   }
