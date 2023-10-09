@@ -6,6 +6,7 @@ import {
   ChannelType,
   EmbedBuilder,
   ForumChannel,
+  GuildForumTag,
   Message,
   OverwriteType,
   PermissionFlagsBits,
@@ -13,9 +14,19 @@ import {
 } from "discord.js";
 
 import colours from "../../constants/colours.js";
-import { disableComponents } from "../disableComponents.js";
 
-export async function setChannel(originalMessage: Message<true>, userId: Snowflake) {
+type ChannelData = {
+  channel: ForumChannel;
+  createdTags: {
+    message?: GuildForumTag;
+    user?: GuildForumTag;
+    open?: GuildForumTag;
+    approved?: GuildForumTag;
+    rejected?: GuildForumTag;
+  };
+};
+
+export async function setChannel(originalMessage: Message<true>, userId: Snowflake): Promise<ChannelData> {
   let TAGS = [
     { name: "t: message", emoji: { id: null, name: "🗨️" } },
     { name: "t: user", emoji: { id: null, name: "👥" } },
@@ -51,121 +62,109 @@ export async function setChannel(originalMessage: Message<true>, userId: Snowfla
 
   const message = await originalMessage.edit({ content: "", embeds: [embed], components: [menuRow, buttonRow] });
 
-  const componentInteraction = await message
-    .awaitMessageComponent({
-      filter: (i) => i.user.id === userId,
-      time: 890_000,
-    })
-    .catch(
-      async () =>
-        void (await message
-          .edit({
-            content: "You took too long to respond.",
-            components: [disableComponents(menuRow), disableComponents(buttonRow)],
-          })
-          .catch(() => undefined)),
-    );
+  const collector = message.createMessageComponentCollector({
+    filter: (i) => i.user.id === userId,
+    time: 890_000,
+  });
 
-  if (!componentInteraction) return;
-  componentInteraction.deferUpdate();
+  return new Promise((resolve) => {
+    collector.on("collect", async (componentInteraction) => {
+      if (componentInteraction.isChannelSelectMenu()) {
+        const channel = componentInteraction.channels.first();
+        if (!(channel instanceof ForumChannel)) throw new Error("Channel is not a ForumChannel");
 
-  if (componentInteraction.isChannelSelectMenu()) {
-    const channel = componentInteraction.channels.first();
-    if (!(channel instanceof ForumChannel)) throw new Error("Channel is not a ForumChannel");
+        if (!channel.manageable) {
+          await componentInteraction.reply({
+            content: "Reindeer does not have access to manage the channel you selected. Please try again.",
+            ephemeral: true,
+          });
+          return;
+        }
 
-    if (!message.member) throw new Error("message.member is null");
-    if (!channel.manageable) {
-      return void (await message.edit({
-        content: "Reindeer does not have access to manage the channel you selected. Please try again.",
-        embeds: [],
-        components: [disableComponents(menuRow), disableComponents(buttonRow)],
-      }));
-    }
+        if (channel.availableTags.length > 15) {
+          await componentInteraction.reply({
+            content: "The channel you have selected has more than 15 tags. Please try again.",
+            ephemeral: true,
+          });
+          return;
+        }
 
-    if (channel.availableTags.length > 15) {
-      return void (await message.edit({
-        content: "The channel you have selected has more than 15 tags. Please try again.",
-        embeds: [],
-        components: [disableComponents(menuRow), disableComponents(buttonRow)],
-      }));
-    }
+        for (const tag of channel.availableTags) {
+          if (TAGS.map((t) => t.name).includes(tag.name)) {
+            TAGS = TAGS.filter((t) => t.name !== tag.name);
+          }
+        }
 
-    for (const tag of channel.availableTags) {
-      if (TAGS.map((t) => t.name).includes(tag.name)) {
-        TAGS = TAGS.filter((t) => t.name !== tag.name);
-      }
-    }
+        await channel.setAvailableTags([...channel.availableTags, ...TAGS]);
 
-    await channel.setAvailableTags([...channel.availableTags, ...TAGS]);
-
-    return {
-      channel,
-      createdTags: {
-        message: channel.availableTags.find((tag) => tag.name === "t: message"),
-        user: channel.availableTags.find((tag) => tag.name === "t: user"),
-        open: channel.availableTags.find((tag) => tag.name === "s: open"),
-        approved: channel.availableTags.find((tag) => tag.name === "s: approved"),
-        rejected: channel.availableTags.find((tag) => tag.name === "s: rejected"),
-      },
-    };
-  } else if (componentInteraction.isButton()) {
-    if (!message.guild.features.includes("COMMUNITY")) {
-      return void (await message.edit({
-        content:
-          "In order to create a forum channel, your server must have be a community server. Please enable Community in your server's settings and try again.",
-        embeds: [],
-        components: [disableComponents(menuRow), disableComponents(buttonRow)],
-      }));
-    }
-
-    let channel = await message.guild.channels
-      .create({
-        name: "reports",
-        type: ChannelType.GuildForum,
-        permissionOverwrites: [
-          // Deny @everyone permission to view the channel
-          { id: message.guild.id, type: OverwriteType.Role, deny: PermissionFlagsBits.ViewChannel },
-          // Allow Reindeer to manage the channel
-          {
-            id: message.author.id,
-            type: OverwriteType.Member,
-            allow: [
-              PermissionFlagsBits.ViewChannel,
-              PermissionFlagsBits.ManageThreads,
-              PermissionFlagsBits.ManageChannels,
-              PermissionFlagsBits.ManageMessages,
-              PermissionFlagsBits.SendMessages,
-              // sigh
-              // https://discord.com/channels/222078108977594368/222197033908436994/1139207283356729444
-              // https://github.com/discordjs/guide/commit/3ea2ef3af749dc4e80b129b56b900f9e2d6faec6
-              PermissionFlagsBits.SendMessagesInThreads,
-            ],
+        resolve({
+          channel,
+          createdTags: {
+            message: channel.availableTags.find((tag) => tag.name === "t: message"),
+            user: channel.availableTags.find((tag) => tag.name === "t: user"),
+            open: channel.availableTags.find((tag) => tag.name === "s: open"),
+            approved: channel.availableTags.find((tag) => tag.name === "s: approved"),
+            rejected: channel.availableTags.find((tag) => tag.name === "s: rejected"),
           },
-        ],
-        availableTags: TAGS,
-      })
-      .catch(() => undefined);
+        });
+      } else if (componentInteraction.isButton()) {
+        if (!message.guild.features.includes("COMMUNITY")) {
+          await componentInteraction.reply({
+            content:
+              "To create a forum channel, your server must be a community server. Please enable Community in your server's settings and try again.",
+            ephemeral: true,
+          });
+          return;
+        }
 
-    if (!channel) {
-      channel = await message.guild.channels.create({
-        name: "reports",
-        type: ChannelType.GuildForum,
-        permissionOverwrites: [],
-        availableTags: TAGS,
-      });
-    }
+        let channel = await message.guild.channels
+          .create({
+            name: "reports",
+            type: ChannelType.GuildForum,
+            permissionOverwrites: [
+              // Deny @everyone permission to view the channel
+              { id: message.guild.id, type: OverwriteType.Role, deny: PermissionFlagsBits.ViewChannel },
+              // Allow Reindeer to manage the channel
+              {
+                id: message.author.id,
+                type: OverwriteType.Member,
+                allow: [
+                  PermissionFlagsBits.ViewChannel,
+                  PermissionFlagsBits.ManageThreads,
+                  PermissionFlagsBits.ManageChannels,
+                  PermissionFlagsBits.ManageMessages,
+                  PermissionFlagsBits.SendMessages,
+                  // sigh
+                  // https://discord.com/channels/222078108977594368/222197033908436994/1139207283356729444
+                  // https://github.com/discordjs/guide/commit/3ea2ef3af749dc4e80b129b56b900f9e2d6faec6
+                  PermissionFlagsBits.SendMessagesInThreads,
+                ],
+              },
+            ],
+            availableTags: TAGS,
+          })
+          .catch(() => undefined);
 
-    return {
-      channel,
-      createdTags: {
-        message: channel.availableTags.find((tag) => tag.name === "t: message"),
-        user: channel.availableTags.find((tag) => tag.name === "t: user"),
-        open: channel.availableTags.find((tag) => tag.name === "s: open"),
-        approved: channel.availableTags.find((tag) => tag.name === "s: approved"),
-        rejected: channel.availableTags.find((tag) => tag.name === "s: rejected"),
-      },
-    };
-  }
+        if (!channel) {
+          channel = await message.guild.channels.create({
+            name: "reports",
+            type: ChannelType.GuildForum,
+            permissionOverwrites: [],
+            availableTags: TAGS,
+          });
+        }
 
-  throw new Error("Collected interaction is not a button or channel select menu");
+        resolve({
+          channel,
+          createdTags: {
+            message: channel.availableTags.find((tag) => tag.name === "t: message"),
+            user: channel.availableTags.find((tag) => tag.name === "t: user"),
+            open: channel.availableTags.find((tag) => tag.name === "s: open"),
+            approved: channel.availableTags.find((tag) => tag.name === "s: approved"),
+            rejected: channel.availableTags.find((tag) => tag.name === "s: rejected"),
+          },
+        });
+      }
+    });
+  });
 }
