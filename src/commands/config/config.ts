@@ -3,6 +3,7 @@ import { Subcommand } from "@sapphire/plugin-subcommands";
 import { EmbedBuilder, PermissionFlagsBits, User } from "discord.js";
 
 import colours from "../../constants/colours.js";
+import { resetData } from "../../functions/config/resetData.js";
 import { setChannel } from "../../functions/config/setChannel.js";
 import { setConfirmMessage } from "../../functions/config/setConfirmMessage.js";
 import { setFeedback } from "../../functions/config/setFeedback.js";
@@ -22,6 +23,7 @@ export class ConfigChatInputCommand extends Subcommand {
         { name: "confirmation-message", chatInputRun: "chatInputConfirmationMessage" },
         { name: "permissions-cooldowns", chatInputRun: "chatInputPermissionsCooldowns" },
         { name: "feedback", chatInputRun: "chatInputFeedback" },
+        { name: "reset", chatInputRun: "chatInputReset" },
       ],
     });
   }
@@ -52,6 +54,9 @@ export class ConfigChatInputCommand extends Subcommand {
           )
           .addSubcommand((command) =>
             command.setName("feedback").setDescription("Configure author feedback for this server."),
+          )
+          .addSubcommand((command) =>
+            command.setName("reset").setDescription("Delete all associated data with this server."),
           ),
       {
         idHints: [],
@@ -76,7 +81,7 @@ export class ConfigChatInputCommand extends Subcommand {
       }));
     }
 
-    await interaction.reply({ content: "Initialising the setup...", ephemeral: true });
+    await interaction.reply({ content: "Initialising the config...", ephemeral: true });
 
     const message = await interaction.channel?.send("Please wait...").catch(() => undefined);
 
@@ -239,5 +244,12 @@ export class ConfigChatInputCommand extends Subcommand {
       embeds: [this.generateEmbed("Author feedback settings updated.", interaction.user)],
       components: [],
     });
+  }
+
+  public async chatInputReset(interaction: Subcommand.ChatInputCommandInteraction<"cached">) {
+    const { message, guild } = (await this.checkPermissionsAndSendMessage(interaction)) ?? {};
+    if (!message || !guild) return;
+
+    await resetData(message, interaction.user.id);
   }
 }
