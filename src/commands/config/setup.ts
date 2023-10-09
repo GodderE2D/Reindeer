@@ -37,7 +37,10 @@ export class SetupChatInputCommand extends Command {
 
     if (existingGuild) {
       return interaction.reply({
-        content: "Reindeer is already setup in this server. Use one of the `/config` commands instead.",
+        content: [
+          "Reindeer is already setup in this server. Use one of the `/config` commands instead.",
+          "If you want to delete all data associated with this server, please use `/config reset`.",
+        ].join("\n"),
         ephemeral: true,
       });
     }
@@ -114,6 +117,7 @@ export class SetupChatInputCommand extends Command {
             // "- Use `/config automod` to enable and change automod settings.",
             // "- Use `/config global-alert` to enable Global Alert (a global ban system).",
             "- Use `/config channel` to change the report channel you just set.",
+            "- Use `/config reset` to delete all data associated with this server.",
           ].join("\n"),
         },
         {
