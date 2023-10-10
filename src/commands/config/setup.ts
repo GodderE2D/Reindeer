@@ -125,6 +125,11 @@ export class SetupChatInputCommand extends Command {
           value:
             "If you need help using Reindeer, feel free to join our [support server](https://discord.gg/R2FDvcPXTK). Thanks for using Reindeer!",
         },
+        {
+          name: "Privacy Notice",
+          value:
+            "Reindeer records message content of reported messages and sends them back to Discord, but does not store them. For more information, see our [privacy policy](https://reindeer.bsr.gg/privacy).",
+        },
       );
 
     return await message.edit({
