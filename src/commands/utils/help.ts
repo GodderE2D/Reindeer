@@ -62,13 +62,13 @@ export class InviteCommand extends Command {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      reportChannel?.permissionsFor(interaction.member)
+      reportChannel?.permissionsFor(interaction.member).has(PermissionFlagsBits.ViewChannel)
     ) {
       embed.addFields(
         {
           name: "Closing reports",
           value: `Whenever a user submits a report, a new thread will be created in ${
-            !reportChannel ?? "the channel you created during setup"
+            reportChannel ?? "the channel you created during setup"
           }. Review the report, and then use the buttons or ${command("close")} to close the report.`,
         },
         {
