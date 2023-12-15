@@ -107,7 +107,7 @@ report, feature request, please [open an issue](https://github.com/GodderE2D/rei
 fixing a bug or adding a new feature, please [open a pull request](https://github.com/GodderE2D/reindeer/pulls).
 
 If you'd like to report a security vulnerability or otherwise want to contact me, please email me at
-[goddere2d@modslides.com](mailto:goddere2d@modslides.com) or [godderseesyou@gmail.com](mailto:godderseesyou@gmail.com).
+[goddere2d@bsr.gg](mailto:goddere2d@bsr.gg) or [godderseesyou@gmail.com](mailto:godderseesyou@gmail.com).
 
 ## PR Guidelines
 
