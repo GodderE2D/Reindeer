@@ -49,8 +49,8 @@ export async function setReportStatus(
       status === "Rejected"
         ? report.guild.rejectedTagId
         : status === "Approved"
-        ? report.guild.approvedTagId
-        : report.guild.openTagId,
+          ? report.guild.approvedTagId
+          : report.guild.openTagId,
     ]);
   } catch (error) {
     return void interaction.editReply(
