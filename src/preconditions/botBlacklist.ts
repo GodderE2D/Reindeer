@@ -1,11 +1,11 @@
 import { $Enums } from "@prisma/client";
-import { AllFlowsPrecondition, Piece } from "@sapphire/framework";
+import { AllFlowsPrecondition } from "@sapphire/framework";
 import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from "discord.js";
 
 import { botBlacklistCache } from "../index.js";
 
 export class BotBlacklistPrecondition extends AllFlowsPrecondition {
-  public constructor(context: Piece.Context, options: AllFlowsPrecondition.Options) {
+  public constructor(context: AllFlowsPrecondition.LoaderContext, options: AllFlowsPrecondition.Options) {
     super(context, {
       ...options,
       position: 15,
