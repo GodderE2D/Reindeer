@@ -13,6 +13,7 @@ export class TrackingGuildMemberAddListener extends Listener {
       event: Events.GuildMemberAdd,
     });
   }
+
   public async run(member: GuildMember) {
     // This event sometimes invokes even though the member has never re-joined.
     if ((member.joinedTimestamp ?? Infinity) < Date.now() - 60_000) return;
@@ -29,7 +30,7 @@ export class TrackingGuildMemberAddListener extends Listener {
         .setColor(colours.green)
         .setDescription(`Tracked user ${member} has joined the server.`);
 
-      sendTrackingLog(tracker, embed, member);
+      sendTrackingLog(tracker, embed, member.user);
     }
   }
 }
