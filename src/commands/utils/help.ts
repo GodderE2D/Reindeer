@@ -32,9 +32,7 @@ export class InviteCommand extends Command {
   public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const hide = interaction.options.getBoolean("hide") ?? true;
 
-    if (!interaction.inCachedGuild()) throw new Error("Command not ran in a cached guild.");
-
-    const guild = await prisma.guild.findUnique({ where: { guildId: interaction.guild.id } });
+    const guild = interaction.guild && (await prisma.guild.findUnique({ where: { guildId: interaction.guild.id } }));
     const reportChannel = guild && interaction.guild.channels.cache.get(guild.forumChannelId);
 
     const command = (name: string) => {
@@ -60,10 +58,13 @@ export class InviteCommand extends Command {
         ].join("\n"),
       );
 
-    if (
-      interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      reportChannel?.permissionsFor(interaction.member).has(PermissionFlagsBits.ViewChannel)
-    ) {
+    const canAccessReports = !!(
+      interaction.inCachedGuild() &&
+      (interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
+        reportChannel?.permissionsFor(interaction.member)?.has(PermissionFlagsBits.ViewChannel))
+    );
+
+    if (canAccessReports || !interaction.inCachedGuild()) {
       embed.addFields(
         {
           name: "Closing reports",
@@ -107,7 +108,11 @@ export class InviteCommand extends Command {
 
     let setupEmbed: EmbedBuilder | undefined = undefined;
 
-    if (!reportChannel && interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+    if (
+      interaction.inCachedGuild() &&
+      !reportChannel &&
+      interaction.member.permissions.has(PermissionFlagsBits.Administrator)
+    ) {
       setupEmbed = new EmbedBuilder()
         .setColor(colours.warning)
         .setTitle("⚠️ Setup Reindeer in your server")
