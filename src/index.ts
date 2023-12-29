@@ -21,6 +21,7 @@ import { makeCache } from "./constants/makeCache.js";
 import { fetchBotBlacklist } from "./functions/botBlacklistCache.js";
 import envVarCheck from "./functions/envCheck.js";
 import { cacheStats, registerMetrics } from "./functions/registerMetrics.js";
+import { runVoteReminder } from "./functions/runVoteReminder.js";
 import Logger from "./logger.js";
 import * as routes from "./routes.js";
 
@@ -85,6 +86,9 @@ setInterval(() => fetchBotBlacklist(botBlacklistCache), 30_000); // Fallback in 
 // Catch uncaught errors
 process.on("unhandledRejection", (err) => logger.error("Encountered an unhandled promise rejection:", err));
 process.on("uncaughtException", (err) => logger.error("Encountered an uncaught exception:", err));
+
+// Vote reminders
+setInterval(() => runVoteReminder(), 60_000);
 
 // Prometheus metrics
 registerMetrics();

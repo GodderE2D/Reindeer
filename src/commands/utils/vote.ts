@@ -1,7 +1,10 @@
 import { ChatInputCommand, Command } from "@sapphire/framework";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
+import { ComponentType } from "discord.js";
 
 import colours from "../../constants/colours.js";
+import emojis from "../../constants/emojis.js";
+import { findOrCreateUser } from "../../functions/findOrCreateUser.js";
 import { prisma } from "../../index.js";
 
 export class VoteCommand extends Command {
@@ -30,6 +33,8 @@ export class VoteCommand extends Command {
 
   public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const hide = interaction.options.getBoolean("hide") ?? true;
+
+    const user = await findOrCreateUser(interaction.user.id);
 
     const votes = await prisma.vote.findMany({
       where: { userId: interaction.user.id },
@@ -65,13 +70,65 @@ export class VoteCommand extends Command {
             .join("\n") || "No votes yet 🥲",
       });
 
+    const linkButton = new ButtonBuilder()
+      .setLabel("Vote on Top.gg")
+      .setStyle(ButtonStyle.Link)
+      .setURL("https://top.gg/bot/1126157327746211840/vote");
+
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      linkButton,
       new ButtonBuilder()
-        .setLabel("Vote on Top.gg")
-        .setStyle(ButtonStyle.Link)
-        .setURL("https://top.gg/bot/1126157327746211840/vote"),
+        .setCustomId(`vote_toggle_reminders:${user.voteRemindersEnabled}`)
+        .setLabel("Vote Reminders")
+        .setEmoji(user.voteRemindersEnabled ? emojis.onswitch.replace(/\D/g, "") : emojis.offswitch.replace(/\D/g, ""))
+        .setStyle(ButtonStyle.Secondary),
     );
 
-    return await interaction.reply({ embeds: [embed], components: [row], ephemeral: hide });
+    const msg = await interaction.reply({ embeds: [embed], components: [row], ephemeral: hide, fetchReply: true });
+
+    const collector = msg.createMessageComponentCollector({
+      componentType: ComponentType.Button,
+      time: 890_000,
+    });
+
+    collector.on("collect", async (button) => {
+      if (button.user.id !== interaction.user.id) {
+        await button.reply({ content: "Please run `/vote` yourself to control your vote reminders.", ephemeral: true });
+        return;
+      }
+
+      const enabled = button.customId.split(":")[1] === "true";
+      await prisma.user.update({ where: { userId: interaction.user.id }, data: { voteRemindersEnabled: !enabled } });
+
+      const newRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        linkButton,
+        new ButtonBuilder()
+          .setCustomId(`vote_toggle_reminders:${!enabled}`)
+          .setLabel("Vote Reminders")
+          .setEmoji(!enabled ? emojis.onswitch.replace(/\D/g, "") : emojis.offswitch.replace(/\D/g, ""))
+          .setStyle(ButtonStyle.Secondary),
+      );
+
+      await interaction.editReply({ components: [newRow] });
+
+      const enabledText =
+        "You have enabled vote reminders; Reindeer will send you a DM once you can vote again. Ensure that you can receive DMs from Reindeer for this to work.";
+      const disabledText = "You have disabled vote reminders.";
+
+      await button.reply({ content: !enabled ? enabledText : disabledText, ephemeral: true });
+    });
+
+    collector.on("end", async () => {
+      const disabledRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        linkButton,
+        new ButtonBuilder()
+          .setCustomId("vote_toggle_reminders")
+          .setLabel("Vote Reminders")
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(true),
+      );
+
+      await interaction.editReply({ components: [disabledRow] });
+    });
   }
 }

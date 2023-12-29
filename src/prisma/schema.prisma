@@ -7,6 +7,15 @@ datasource db {
   url      = env("DB_CONNECTION_URL")
 }
 
+model User {
+  userId    String   @id @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  voteRemindersEnabled Boolean @default(false) @map("vote_reminders_enabled")
+
+  @@map("user")
+}
+
 model GuildMember {
   userId    String   @id @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
