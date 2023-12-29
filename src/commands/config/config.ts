@@ -8,6 +8,7 @@ import { setChannel } from "../../functions/config/setChannel.js";
 import { setConfirmMessage } from "../../functions/config/setConfirmMessage.js";
 import { setFeedback } from "../../functions/config/setFeedback.js";
 import { Field, setFields } from "../../functions/config/setFields.js";
+import { MiscSettings, setMisc } from "../../functions/config/setMisc.js";
 import { setPermissionsAndCooldowns } from "../../functions/config/setPermissionsAndCooldowns.js";
 import { prisma } from "../../index.js";
 
@@ -23,6 +24,7 @@ export class ConfigChatInputCommand extends Subcommand {
         { name: "confirmation-message", chatInputRun: "chatInputConfirmationMessage" },
         { name: "permissions-cooldowns", chatInputRun: "chatInputPermissionsCooldowns" },
         { name: "feedback", chatInputRun: "chatInputFeedback" },
+        { name: "misc", chatInputRun: "chatInputMisc" },
         { name: "reset", chatInputRun: "chatInputReset" },
       ],
     });
@@ -54,6 +56,11 @@ export class ConfigChatInputCommand extends Subcommand {
           )
           .addSubcommand((command) =>
             command.setName("feedback").setDescription("Configure author feedback for this server."),
+          )
+          .addSubcommand((command) =>
+            command
+              .setName("misc")
+              .setDescription("Configure miscellaneous settings for this server, like new report ping roles."),
           )
           .addSubcommand((command) =>
             command.setName("reset").setDescription("Delete all associated data with this server."),
@@ -242,6 +249,29 @@ export class ConfigChatInputCommand extends Subcommand {
 
     return await message.edit({
       embeds: [this.generateEmbed("Author feedback settings updated.", interaction.user)],
+      components: [],
+    });
+  }
+
+  public async chatInputMisc(interaction: Subcommand.ChatInputCommandInteraction<"cached">) {
+    const { message, guild } = (await this.checkPermissionsAndSendMessage(interaction)) ?? {};
+    if (!message || !guild) return;
+
+    const existingSettings: MiscSettings = {
+      newReportPingRoles: guild.newReportPingRoles,
+    };
+
+    const settings = await setMisc(message, interaction.user.id, existingSettings);
+
+    await prisma.guild.update({
+      where: { guildId: interaction.guild.id },
+      data: {
+        newReportPingRoles: settings.newReportPingRoles,
+      },
+    });
+
+    return await message.edit({
+      embeds: [this.generateEmbed("Miscellaneous settings updated.", interaction.user)],
       components: [],
     });
   }

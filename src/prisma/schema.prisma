@@ -67,6 +67,8 @@ model Guild {
   authorFeedbackApprovedMessage String  @map("author_feedback_approved_message")
   authorFeedbackRejectedMessage String  @map("author_feedback_rejected_message")
 
+  newReportPingRoles String[] @map("new_report_ping_roles")
+
   @@map("guild")
 }
 

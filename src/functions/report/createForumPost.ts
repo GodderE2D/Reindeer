@@ -104,6 +104,7 @@ export async function createForumPost(
     .create({
       name: `Report #${number} - ${target.tag} (${target.id})`,
       message: {
+        content: guildData.newReportPingRoles.length ? `<@&${guildData.newReportPingRoles.join(">, <@&")}>` : "",
         embeds: messagePreviewEmbed ? [forumEmbed, messagePreviewEmbed] : [forumEmbed],
         components: [forumRow],
       },
