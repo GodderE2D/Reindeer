@@ -60,7 +60,7 @@ export class ConfigChatInputCommand extends Subcommand {
           .addSubcommand((command) =>
             command
               .setName("misc")
-              .setDescription("Configure miscellaneous settings for this server, like new report ping roles."),
+              .setDescription("Configure miscellaneous settings for this server, like new report pings."),
           )
           .addSubcommand((command) =>
             command.setName("reset").setDescription("Delete all associated data with this server."),
