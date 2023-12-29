@@ -7,8 +7,8 @@ export async function runVoteReminder() {
   const votes = await prisma.vote.findMany({
     where: {
       AND: [
-        { createdAt: { gte: new Date(Date.now() - 43_260_000) } },
-        { createdAt: { lte: new Date(Date.now() - 43_320_000) } },
+        { createdAt: { gt: new Date(Date.now() - 43_260_000) } },
+        { createdAt: { lte: new Date(Date.now() - 43_200_000) } },
       ],
     },
   });
