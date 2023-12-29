@@ -40,7 +40,7 @@ export class TrackingMessageDeleteListener extends Listener {
           message.attachments.filter((attachment) => attachment.contentType?.startsWith("image")).first()?.url ?? null,
         );
 
-      sendTrackingLog(tracker, embed, message.member);
+      sendTrackingLog(tracker, embed, message.author);
       prisma.trackedContent.delete({ where: { id: tracker.id } });
     }
   }

@@ -45,7 +45,7 @@ export class TrackingMessageUpdateListener extends Listener {
             null,
         );
 
-      sendTrackingLog(tracker, embed, newMessage.member);
+      sendTrackingLog(tracker, embed, newMessage.author);
     }
   }
 }
