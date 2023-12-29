@@ -156,9 +156,7 @@ export class TrackerChatInputCommand extends Command {
                   iconURL: interaction.user.displayAvatarURL({ forceStatic: true }),
                 })
                 .setDescription(
-                  `${interaction.user} deleted an auto-added ${
-                    thisTracker.type === "Message" ? "message" : "user"
-                  } tracker for ${
+                  `${interaction.user} deleted a ${thisTracker.type === "Message" ? "message" : "user"} tracker for ${
                     thisTracker.type === "Message"
                       ? `[this message](${messageLink(
                           thisTracker.channelId ?? "",

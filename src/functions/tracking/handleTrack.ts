@@ -28,15 +28,15 @@ export async function handleTracking(
 
   if (!report) return interaction.editReply(`Report #${number} doesn't exist.`);
 
-  const existingTrackedUser =
-    !message &&
-    (await prisma.trackedContent.findFirst({
-      where: {
-        reportId: report.id,
-        type: "User",
-        contentId: target.id,
-      },
-    }));
+  if (!message && trackAuthor) trackAuthor = false;
+
+  const existingTrackedUser = await prisma.trackedContent.findFirst({
+    where: {
+      reportId: report.id,
+      type: "User",
+      contentId: target.id,
+    },
+  });
 
   if (existingTrackedUser) {
     return interaction.editReply(`${target} is already being tracked for report #${number}.`);
@@ -74,6 +74,7 @@ export async function handleTracking(
         data: {
           contentId: message.id,
           channelId: message.channel.id,
+          authorId: message.author.id,
           type: "Message",
           report: { connect: { id: report.id } },
           guild: { connect: { guildId: interaction.guild.id } },
