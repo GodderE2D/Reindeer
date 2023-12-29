@@ -111,7 +111,7 @@ export async function setReportStatus(
       .setStyle(ButtonStyle.Primary),
   );
 
-  const components = [];
+  const components: ActionRowBuilder<ButtonBuilder>[] = [];
   if (
     report.guild.authorFeedbackEnabled &&
     !report.guild.authorFeedbackAutoSend &&
