@@ -4,7 +4,7 @@ import { ApplicationCommandType, UserContextMenuCommandInteraction } from "disco
 import { handleReport } from "../../../functions/report/handleReport.js";
 
 export class ReportUserContextMenuCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: "Report user",

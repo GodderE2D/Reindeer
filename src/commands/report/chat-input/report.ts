@@ -5,7 +5,7 @@ import { parseMessageLink } from "../../../functions/parseMessageLink.js";
 import { handleReport } from "../../../functions/report/handleReport.js";
 
 export class ReportChatInputCommand extends Subcommand {
-  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
+  public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
     super(context, {
       ...options,
       name: "report",

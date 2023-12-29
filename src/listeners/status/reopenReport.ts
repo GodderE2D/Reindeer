@@ -4,7 +4,7 @@ import { Interaction } from "discord.js";
 import { setReportStatus } from "../../functions/setReportStatus.js";
 
 export class ReopenReportListener extends Listener {
-  public constructor(context: Listener.Context, options: Listener.Options) {
+  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
     super(context, {
       ...options,
       once: false,

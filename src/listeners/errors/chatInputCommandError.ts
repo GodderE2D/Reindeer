@@ -4,7 +4,7 @@ import Sentry from "@sentry/node";
 import { handleCommandError } from "../../functions/handleCommandError.js";
 
 export class ChatInputCommandErrorListener extends Listener {
-  public constructor(context: Listener.Context, options: Listener.Options) {
+  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
     super(context, {
       ...options,
       once: false,

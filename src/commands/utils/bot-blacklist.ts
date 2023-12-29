@@ -16,7 +16,7 @@ import colours from "../../constants/colours.js";
 import { botBlacklistCache, env, prisma } from "../../index.js";
 
 export class BotBlacklistChatInputCommand extends Subcommand {
-  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
+  public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
     super(context, {
       ...options,
       name: "bot-blacklist",

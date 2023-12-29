@@ -5,7 +5,7 @@ import { parseMessageLink } from "../../functions/parseMessageLink.js";
 import { handleTracking } from "../../functions/tracking/handleTrack.js";
 
 export class TrackChatInputCommand extends Subcommand {
-  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
+  public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
     super(context, {
       ...options,
       name: "track",

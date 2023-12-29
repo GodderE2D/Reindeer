@@ -4,7 +4,7 @@ import { Client } from "discord.js";
 import { logger, prisma } from "../../index.js";
 
 export class FetchAllTrackedContentListener extends Listener {
-  public constructor(context: Listener.Context, options: Listener.Options) {
+  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
     super(context, {
       ...options,
       once: true,

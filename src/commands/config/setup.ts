@@ -10,7 +10,7 @@ import { DEFAULT_FIELDS } from "../../functions/config/setFields.js";
 import { prisma } from "../../index.js";
 
 export class SetupChatInputCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: "setup",

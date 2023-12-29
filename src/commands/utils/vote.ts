@@ -8,7 +8,7 @@ import { findOrCreateUser } from "../../functions/findOrCreateUser.js";
 import { prisma } from "../../index.js";
 
 export class VoteCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: "vote",

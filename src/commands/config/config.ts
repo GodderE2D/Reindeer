@@ -13,7 +13,7 @@ import { setPermissionsAndCooldowns } from "../../functions/config/setPermission
 import { prisma } from "../../index.js";
 
 export class ConfigChatInputCommand extends Subcommand {
-  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
+  public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
     super(context, {
       ...options,
       name: "config",

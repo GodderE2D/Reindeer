@@ -6,7 +6,7 @@ import { sendTrackingLog } from "../../../functions/tracking/sendTrackingLog.js"
 import { prisma } from "../../../index.js";
 
 export class TrackingMessageDeleteListener extends Listener {
-  public constructor(context: Listener.Context, options: Listener.Options) {
+  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
     super(context, {
       ...options,
       once: false,
