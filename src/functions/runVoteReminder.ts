@@ -28,7 +28,9 @@ export async function runVoteReminder() {
         iconURL: "https://cdn.discordapp.com/avatars/1126157327746211840/0cdcb588f96ec9cfc5d4f9685c8987f4.webp",
       })
       .setDescription(
-        `You have last voted for Reindeer <t:${vote.createdAt.getTime() / 1000}:R>, you can now vote again.`,
+        `You have last voted for Reindeer <t:${Math.floor(
+          vote.createdAt.getTime() / 1000,
+        )}:R>, you can now vote again.`,
       )
       .setFooter({ text: "To disable reminders, run /vote and click on the button." });
 
