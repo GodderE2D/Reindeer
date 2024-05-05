@@ -1,10 +1,17 @@
-import { Guild } from "@prisma/client";
-import { GuildMember, Message, User } from "discord.js";
+import type { Guild as PrismaGuild } from "@prisma/client";
+import { Guild, Message, User } from "discord.js";
 
 import { prisma } from "../../index.js";
 
-export async function checkUserPermissions(author: GuildMember, guildData: Guild, target: User, message?: Message) {
-  const targetMember = await author.guild.members.fetch(target.id).catch(() => undefined);
+export async function checkUserPermissions(
+  author: User,
+  guild: Guild,
+  guildData: PrismaGuild,
+  target: User,
+  message?: Message,
+) {
+  const authorMember = await guild.members.fetch(author.id).catch(() => undefined);
+  const targetMember = await guild.members.fetch(target.id).catch(() => undefined);
 
   if (target.bot) {
     return "You cannot report bots.";
@@ -18,15 +25,14 @@ export async function checkUserPermissions(author: GuildMember, guildData: Guild
     return "You cannot report this user.";
   }
 
-  if (author.roles.cache.some((role) => guildData.reportCooldownBypassRoles.includes(role.id))) return true;
+  if (authorMember?.roles.cache.some((role) => guildData.reportCooldownBypassRoles.includes(role.id))) return true;
 
   const duplicateReport = await prisma.report.findFirst({
     where: {
-      guildId: author.guild.id,
+      guildId: guild.id,
       createdAt: { gte: new Date(Date.now() - guildData.duplicateReportCooldown * 1000) },
       OR: [{ messageId: message?.id }, { targetId: target.id }],
     },
-    take: 1,
   });
 
   if (duplicateReport) {
@@ -35,7 +41,7 @@ export async function checkUserPermissions(author: GuildMember, guildData: Guild
 
   const recentReport = await prisma.report.findFirst({
     where: {
-      guildId: author.guild.id,
+      guildId: guild.id,
       createdAt: { gte: new Date(Date.now() - guildData.reportCooldown * 1000) },
       authorId: author.id,
     },

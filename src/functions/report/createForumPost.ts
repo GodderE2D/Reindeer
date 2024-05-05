@@ -5,7 +5,6 @@ import {
   ButtonStyle,
   EmbedBuilder,
   ForumChannel,
-  InteractionResponse,
   Message,
   ModalSubmitInteraction,
   Snowflake,
@@ -20,7 +19,7 @@ export async function createForumPost(
   target: User,
   guildId: Snowflake,
   forumChannel: ForumChannel,
-  confirmResponse: InteractionResponse,
+  confirmMessage: ModalSubmitInteraction,
   modalResponse: ModalSubmitInteraction,
   guildData: Guild,
   message?: Message,
@@ -60,7 +59,7 @@ export async function createForumPost(
   if (message) {
     forumEmbed.addFields({
       name: "Channel",
-      value: `${message.channel}`,
+      value: `${message.channel || "[DM report](https://reindeer.bsr.gg/docs/features/dm-reporting)"}`,
       inline: true,
     });
   }
@@ -111,7 +110,7 @@ export async function createForumPost(
       appliedTags: [message ? guildData.messageTagId : guildData.userTagId, guildData.openTagId],
     })
     .catch(() => {
-      return void confirmResponse.edit(
+      return void confirmMessage.editReply(
         "The admins of this server have denied Reindeer from creating a post in the report channel or deleted one of the tags. Please ask them to configure the permissions and tags properly.",
       );
     });

@@ -1,6 +1,7 @@
 import { Guild } from "@prisma/client";
 import {
   ActionRowBuilder,
+  ButtonInteraction,
   ChatInputCommandInteraction,
   ContextMenuCommandInteraction,
   ModalBuilder,
@@ -8,7 +9,7 @@ import {
 } from "discord.js";
 
 export async function showModal(
-  interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction,
+  interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction | ButtonInteraction,
   guildData: Guild,
   isMessageReport: boolean,
 ) {

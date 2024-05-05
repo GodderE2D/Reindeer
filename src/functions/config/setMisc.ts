@@ -9,8 +9,10 @@ import {
 } from "discord.js";
 
 import colours from "../../constants/colours.js";
+import emojis from "../../constants/emojis.js";
 
 export type MiscSettings = {
+  dmReportsEnabled: boolean;
   newReportPingRoles: string[];
 };
 
@@ -24,6 +26,12 @@ function formatSettings(settings: MiscSettings) {
           settings.newReportPingRoles.length ? `<@&${settings.newReportPingRoles.join(">, <@&")}>` : "None"
         }`,
       ].join("\n"),
+    },
+    {
+      name: "DM reports enabled",
+      value: `**${
+        settings.dmReportsEnabled ? `${emojis.success} Enabled` : `${emojis.error} Disabled`
+      }**: Let members report DM conversations to the server and prove legitimacy of messages.`,
     },
   ];
 }
@@ -56,17 +64,24 @@ export async function setMisc(
     )
     .setFields(formatSettings(settings));
 
-  const buttonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`setup_misc_continue:${message.id}`)
-      .setLabel("Continue")
-      .setStyle(ButtonStyle.Primary),
-  );
+  function createButtonRow() {
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`setup_misc_toggle_dm_reports:${message.id}`)
+        .setLabel("DM reports")
+        .setEmoji(settings.dmReportsEnabled ? emojis.onswitch.replace(/\D/g, "") : emojis.offswitch.replace(/\D/g, ""))
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId(`setup_misc_continue:${message.id}`)
+        .setLabel("Continue")
+        .setStyle(ButtonStyle.Primary),
+    );
+  }
 
   await message.edit({
     content: "",
     embeds: [embed],
-    components: [generateNewReportPingsRow(settings.newReportPingRoles), buttonRow],
+    components: [generateNewReportPingsRow(settings.newReportPingRoles), createButtonRow()],
   });
 
   const collector = message.createMessageComponentCollector({
@@ -95,13 +110,20 @@ export async function setMisc(
 
         await message.edit({
           embeds: [embed.setFields(formatSettings(settings))],
-          components: [generateNewReportPingsRow(settings.newReportPingRoles), buttonRow],
+          components: [generateNewReportPingsRow(settings.newReportPingRoles), createButtonRow()],
         });
         await componentInteraction.reply({
           content: `New report ping roles updated: ${
             settings.newReportPingRoles.length ? `<@&${settings.newReportPingRoles.join(">, <@&")}>` : "None"
           }`,
           ephemeral: true,
+        });
+      } else if (componentInteraction.customId.startsWith("setup_misc_toggle_dm_reports")) {
+        settings.dmReportsEnabled = !settings.dmReportsEnabled;
+
+        await componentInteraction.update({
+          embeds: [embed.setFields(formatSettings(settings))],
+          components: [generateNewReportPingsRow(settings.newReportPingRoles), createButtonRow()],
         });
       } else if (componentInteraction.customId.startsWith("setup_misc_continue")) {
         await componentInteraction.deferUpdate();

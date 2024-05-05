@@ -3,6 +3,7 @@ import { EmbedBuilder, PermissionFlagsBits } from "discord.js";
 
 import { basicAdsRow } from "../../constants/advertisements.js";
 import colours from "../../constants/colours.js";
+import { cacheMembers } from "../../functions/cacheMembers.js";
 import { setChannel } from "../../functions/config/setChannel.js";
 import { DEFAULT_MESSAGE_REPORT_MSG, DEFAULT_USER_REPORT_MSG } from "../../functions/config/setConfirmMessage.js";
 import { DEFAULT_FEEDBACK_APPROVED_MSG, DEFAULT_FEEDBACK_REJECTED_MSG } from "../../functions/config/setFeedback.js";
@@ -113,7 +114,7 @@ export class SetupChatInputCommand extends Command {
             "- Use `/config confirmation-message` to change the confirmation message sent before submitting a report.",
             "- Use `/config permissions-cooldowns` to change permissions and cooldowns for reports.",
             "- Use `/config feedback` to change author feedback settings.",
-            "- Use `/config misc` to change miscellaneous settings, like new report pings.",
+            "- Use `/config misc` to change miscellaneous settings, like DM reports and new report pings.",
             // "- Use `/config logs` to set where logs will be sent.",
             // "- Use `/config automod` to enable and change automod settings.",
             // "- Use `/config global-alert` to enable Global Alert (a global ban system).",
@@ -133,9 +134,11 @@ export class SetupChatInputCommand extends Command {
         },
       );
 
-    return await message.edit({
+    await message.edit({
       embeds: [embed],
       components: [basicAdsRow],
     });
+
+    return await cacheMembers(interaction.guild);
   }
 }

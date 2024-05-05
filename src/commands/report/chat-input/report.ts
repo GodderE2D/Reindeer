@@ -61,14 +61,14 @@ export class ReportChatInputCommand extends Subcommand {
     if (!message) return;
 
     const target = message.author;
-    const author = interaction.member;
+    const author = interaction.user;
 
     return await handleReport(author, target, interaction, message);
   }
 
   public async chatInputUser(interaction: Subcommand.ChatInputCommandInteraction<"cached">) {
     const target = interaction.options.getUser("user", true);
-    const author = interaction.member;
+    const author = interaction.user;
 
     return await handleReport(author, target, interaction);
   }

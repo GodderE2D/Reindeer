@@ -77,6 +77,7 @@ if (env.NODE_ENV === "production" && env.TOPGG_TOKEN?.length) {
 
 // Create collections
 export const commandsRan = new Collection<Snowflake, { createdAt: Date; name: string }>();
+export const memberCache = new Collection<Snowflake, Snowflake[]>();
 
 // Bot blacklist cache
 export const botBlacklistCache = new Set<string>();

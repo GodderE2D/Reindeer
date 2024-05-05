@@ -21,7 +21,7 @@ export async function createReportEntry(
     },
   ];
 
-  if (message) {
+  if (message?.channel) {
     trackedContent.push({
       contentId: message.id,
       channelId: message.channel.id,
@@ -37,7 +37,7 @@ export async function createReportEntry(
       threadId: forumPost.id,
       startMessageId: firstMessageId,
       messageId: message?.id,
-      channelId: message?.channel.id,
+      channelId: message?.channel?.id,
       fieldValues: modalResponse.fields.fields.map((f) => f.value),
       trackedContent: { createMany: { data: trackedContent } },
       guild: { connect: { guildId } },

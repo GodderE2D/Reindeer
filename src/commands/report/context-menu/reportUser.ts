@@ -26,7 +26,7 @@ export class ReportUserContextMenuCommand extends Command {
 
   public override async contextMenuRun(interaction: UserContextMenuCommandInteraction<"cached">) {
     const target = interaction.targetUser;
-    const author = interaction.member;
+    const author = interaction.user;
 
     return await handleReport(author, target, interaction);
   }

@@ -63,17 +63,17 @@ export async function confirmReport(
     embeds: confirmEmbed && [confirmEmbed],
     components: [confirmRow],
     ephemeral: true,
+    fetchReply: true,
   });
 
-  // For some reason directly using the confirmResponse here doesn't work
-  const buttonResponse = await modalResponse.channel
-    ?.awaitMessageComponent({
+  const buttonResponse = await confirmResponse
+    .awaitMessageComponent({
       componentType: ComponentType.Button,
       filter: (i) => i.customId.endsWith(modalResponse.id),
       time: 1000 * 60 * 5,
     })
     .catch(() => {
-      confirmResponse.edit({
+      modalResponse.editReply({
         content: "You took longer than 5 minutes to respond. Please try again.",
         components: [disableComponents(confirmRow)],
       });
@@ -83,7 +83,7 @@ export async function confirmReport(
 
   if (buttonResponse.customId.startsWith("report_cancel")) {
     buttonResponse.deferUpdate();
-    return void confirmResponse.edit({
+    return void modalResponse.editReply({
       content: "Report has been cancelled.",
       components: [disableComponents(confirmRow)],
     });
@@ -91,5 +91,5 @@ export async function confirmReport(
 
   await buttonResponse.deferUpdate();
 
-  return { confirmResponse, confirmRow };
+  return { confirmResponse: modalResponse, confirmRow };
 }

@@ -68,6 +68,7 @@ model Guild {
   authorFeedbackRejectedMessage String  @map("author_feedback_rejected_message")
 
   newReportPingRoles String[] @map("new_report_ping_roles")
+  dmReportsEnabled   Boolean  @default(true) @map("dm_reports_enabled")
 
   @@map("guild")
 }

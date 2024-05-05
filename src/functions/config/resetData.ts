@@ -2,7 +2,7 @@ import Sentry from "@sentry/node";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, Snowflake } from "discord.js";
 
 import colours from "../../constants/colours.js";
-import { logger, prisma } from "../../index.js";
+import { logger, memberCache, prisma } from "../../index.js";
 
 export async function resetData(originalMessage: Message<true>, userId: Snowflake) {
   const embed = new EmbedBuilder()
@@ -60,6 +60,8 @@ export async function resetData(originalMessage: Message<true>, userId: Snowflak
         .setDescription("Data for this server has been deleted. If you want to setup Reindeer again, run `/setup`.");
 
       await originalMessage.edit({ embeds: [successEmbed], components: [] });
+
+      memberCache.delete(originalMessage.guild.id);
     } catch (error) {
       logger.error("An error occurred while trying to reset a server:", error);
       Sentry.captureException(error, { extra: { type: "reset-data" } });

@@ -3,6 +3,7 @@ import { Subcommand } from "@sapphire/plugin-subcommands";
 import { EmbedBuilder, PermissionFlagsBits, User } from "discord.js";
 
 import colours from "../../constants/colours.js";
+import { cacheMembers } from "../../functions/cacheMembers.js";
 import { resetData } from "../../functions/config/resetData.js";
 import { setChannel } from "../../functions/config/setChannel.js";
 import { setConfirmMessage } from "../../functions/config/setConfirmMessage.js";
@@ -60,7 +61,9 @@ export class ConfigChatInputCommand extends Subcommand {
           .addSubcommand((command) =>
             command
               .setName("misc")
-              .setDescription("Configure miscellaneous settings for this server, like new report pings."),
+              .setDescription(
+                "Configure miscellaneous settings for this server, like DM reports and new report pings.",
+              ),
           )
           .addSubcommand((command) =>
             command.setName("reset").setDescription("Delete all associated data with this server."),
@@ -259,6 +262,7 @@ export class ConfigChatInputCommand extends Subcommand {
 
     const existingSettings: MiscSettings = {
       newReportPingRoles: guild.newReportPingRoles,
+      dmReportsEnabled: guild.dmReportsEnabled,
     };
 
     const settings = await setMisc(message, interaction.user.id, existingSettings);
@@ -267,13 +271,16 @@ export class ConfigChatInputCommand extends Subcommand {
       where: { guildId: interaction.guild.id },
       data: {
         newReportPingRoles: settings.newReportPingRoles,
+        dmReportsEnabled: settings.dmReportsEnabled,
       },
     });
 
-    return await message.edit({
+    await message.edit({
       embeds: [this.generateEmbed("Miscellaneous settings updated.", interaction.user)],
       components: [],
     });
+
+    if (settings.dmReportsEnabled) await cacheMembers(interaction.guild);
   }
 
   public async chatInputReset(interaction: Subcommand.ChatInputCommandInteraction<"cached">) {

@@ -29,7 +29,7 @@ export class ReportMessageContextMenuCommand extends Command {
     if (message.partial) message = await message.fetch();
 
     const target = message.author;
-    const author = interaction.member;
+    const author = interaction.user;
 
     return await handleReport(author, target, interaction, message);
   }

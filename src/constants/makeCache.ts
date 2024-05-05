@@ -14,4 +14,8 @@ export const makeCache = Options.cacheWithLimits({
   ReactionUserManager: 0,
   StageInstanceManager: 0,
   VoiceStateManager: 0,
+  GuildMemberManager: {
+    maxSize: 20,
+    keepOverLimit: (member) => member.id === member.client.user.id,
+  },
 });

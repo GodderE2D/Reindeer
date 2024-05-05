@@ -1,10 +1,9 @@
-import { isGuildMember } from "@sapphire/discord.js-utilities";
+import { Guild } from "@prisma/client";
 import {
-  APIInteractionGuildMember,
+  ButtonInteraction,
   ChannelType,
   ChatInputCommandInteraction,
   ContextMenuCommandInteraction,
-  GuildMember,
   Message,
   User,
 } from "discord.js";
@@ -16,37 +15,56 @@ import { checkUserPermissions } from "./checkUserPermissions.js";
 import { confirmReport } from "./confirmReport.js";
 import { createForumPost } from "./createForumPost.js";
 import { createReportEntry } from "./createReportEntry.js";
+import { selectGuild } from "./selectGuild.js";
 import { showModal } from "./showModal.js";
 
 export async function handleReport(
-  author: GuildMember | APIInteractionGuildMember | null,
+  author: User,
   target: User,
-  interaction: ChatInputCommandInteraction<"cached"> | ContextMenuCommandInteraction<"cached">,
+  interaction:
+    | ChatInputCommandInteraction<"cached">
+    | ContextMenuCommandInteraction<"cached">
+    | ButtonInteraction<"cached">,
   message?: Message,
+  dmReport = false,
 ) {
-  if (!target || !isGuildMember(author)) {
-    throw new Error("Target or author is not a GuildMember.");
-  }
+  let selectedGuild = interaction.guild;
+  let guildData: Guild;
 
-  const guildData = await prisma.guild.findUnique({
-    where: { guildId: interaction.guild.id },
-  });
+  if (dmReport && interaction.isContextMenuCommand()) {
+    const { guild, guildData: gd, i } = await selectGuild(author, target, interaction);
 
-  if (!guildData) {
-    return interaction.reply({
-      content:
-        "The admins of this server have not set up Reindeer yet. Please ask them to run `/setup` to run this command.",
-      ephemeral: true,
+    selectedGuild = guild;
+    guildData = gd;
+    interaction = i;
+  } else {
+    if (!target || !(author instanceof User)) {
+      throw new Error("Target or author is not a User.");
+    }
+
+    const gd = await prisma.guild.findUnique({
+      where: { guildId: interaction.guild.id },
     });
+
+    if (!gd) {
+      return interaction.reply({
+        content:
+          "The admins of this server have not set up Reindeer yet. Please ask them to run `/setup` to run this command.",
+        ephemeral: true,
+      });
+    }
+
+    guildData = gd;
   }
 
-  const checkPermissionResult = await checkUserPermissions(author, guildData, target, message);
+  const checkPermissionResult = await checkUserPermissions(author, selectedGuild, guildData, target, message);
 
   if (checkPermissionResult !== true) {
-    return interaction.reply({
-      content: checkPermissionResult,
-      ephemeral: true,
-    });
+    if (interaction.isButton()) {
+      return await interaction.update({ content: checkPermissionResult, embeds: [], components: [] });
+    } else {
+      return await interaction.reply({ content: checkPermissionResult, ephemeral: true });
+    }
   }
 
   const modalResponse = await showModal(interaction, guildData, !!message);
@@ -55,10 +73,10 @@ export async function handleReport(
   const { confirmResponse, confirmRow } = (await confirmReport(target, guildData, modalResponse, message)) ?? {};
   if (!confirmResponse || !confirmRow) return;
 
-  const forumChannel = interaction.guild.channels.cache.get(guildData.forumChannelId);
+  const forumChannel = selectedGuild.channels.cache.get(guildData.forumChannelId);
 
   if (forumChannel?.type !== ChannelType.GuildForum) {
-    return void confirmResponse.edit({
+    return void confirmResponse.editReply({
       content:
         "The admins of this server have deleted their report channel. Please ask them to run `/config` to add one.",
       components: [disableComponents(confirmRow)],
@@ -66,9 +84,9 @@ export async function handleReport(
   }
 
   const { forumPost, number, firstMessage } = await createForumPost(
-    author.user,
+    author,
     target,
-    interaction.guild.id,
+    selectedGuild.id,
     forumChannel,
     confirmResponse,
     modalResponse,
@@ -81,23 +99,23 @@ export async function handleReport(
   try {
     await createReportEntry(
       number,
-      interaction.guild.id,
+      selectedGuild.id,
       forumPost,
       firstMessage.id,
-      author.user,
+      author,
       target,
       modalResponse,
       message,
     );
   } catch (err) {
-    confirmResponse.edit({
+    confirmResponse.editReply({
       content: "An error occurred while creating the report. Please try again.",
       components: [disableComponents(confirmRow)],
     });
     throw err;
   }
 
-  return await confirmResponse.edit({
+  return await confirmResponse.editReply({
     content: "Your report has been submitted. Thank you!",
     components: [basicAdsRow],
   });

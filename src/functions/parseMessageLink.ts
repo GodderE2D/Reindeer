@@ -12,7 +12,7 @@ export async function parseMessageLink(messageLink: string, client: Client, guil
   }
 
   if (guild && regexGroups[1] !== guild.id) {
-    throw "The message you supplied must be from this server.";
+    throw "The message you supplied must be from this server. If you are trying to report a DM message, please use the command in DMs.";
   }
 
   const channel = client.channels.cache.get(regexGroups[2]);
