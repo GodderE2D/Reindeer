@@ -22,10 +22,11 @@ export class DiagnoseChatInputCommand extends Command {
         builder //
           .setName(this.name)
           .setDescription(this.description)
+          .setDMPermission(false)
+          .setDefaultMemberPermissions("0")
           .addBooleanOption((option) =>
             option.setName("hide").setDescription("Whether to hide the response (default: true)"),
-          )
-          .setDMPermission(false),
+          ),
       {
         idHints: [],
       },
@@ -95,7 +96,7 @@ export class DiagnoseChatInputCommand extends Command {
         }
 
         for (const [name, tag] of Object.entries(tags)) {
-          reportsChannelField.push(`- ${name}: ${tag ? `\`${tag.name}\` (\`${tag.id}\`)` : "N/A"}`);
+          reportsChannelField.push(`- ${name} ➔ ${tag ? `\`${tag.name}\` (\`${tag.id}\`)` : "N/A"}`);
         }
 
         if (missingTags) {
