@@ -34,6 +34,7 @@ const emojis = {
   lemon: "<:_:1012179274591129643>",
   onswitch: "<:_:1158543194401808496>",
   offswitch: "<:_:1158543196289257472>",
+  arrow: "<:_:1244107790377549844>",
 } as const satisfies Record<string, EmojiIdentifierResolvable>;
 
 export default emojis;

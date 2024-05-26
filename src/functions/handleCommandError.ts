@@ -59,7 +59,11 @@ export async function handleCommandError(error: Error, interaction: CommandInter
     const replyEmbed = new EmbedBuilder()
       .setColor(colours.error)
       .setDescription(
-        `${emojis.error} An unexpected error occurred, please try again later. If this issue persists, please [join our support server](https://discord.gg/R2FDvcPXTK).`,
+        `${emojis.error} ${
+          error.name === "DiscordAPIError[50013]"
+            ? "Reindeer does not have sufficient permissions to perform this action."
+            : "An unexpected error occurred, please try again later."
+        } Try using \`/diagnose\` and read the [FAQ](https://reindeer.bsr.gg/docs/introduction/faq). If this issue persists, please [join our support server](https://discord.gg/R2FDvcPXTK).`,
       )
       .setFooter({
         text: `Error code: ${errorCode}`,
