@@ -41,33 +41,33 @@
   "dependencies": {
     "@fastify/cors": "^9.0.1",
     "@fastify/helmet": "^11.1.1",
-    "@prisma/client": "^5.13.0",
-    "@sapphire/framework": "^5.2.0",
+    "@prisma/client": "^5.14.0",
+    "@sapphire/framework": "^5.2.1",
     "@sapphire/plugin-subcommands": "^6.0.3",
-    "@sapphire/utilities": "^3.15.3",
-    "@sentry/node": "^7.113.0",
+    "@sapphire/utilities": "^3.16.2",
+    "@sentry/node": "^7.116.0",
     "dayjs": "^1.11.11",
-    "discord.js": "^14.15.1",
+    "discord.js": "^14.15.2",
     "dotenv": "^16.4.5",
-    "fastify": "^4.26.2",
+    "fastify": "^4.27.0",
     "ms": "^2.1.3",
-    "pm2": "^5.3.1",
+    "pm2": "^5.4.0",
     "prom-client": "^15.1.2",
     "topgg-autoposter": "^2.0.2",
-    "zod": "^3.23.6"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/node": "^20.12.8",
+    "@types/node": "^20.12.12",
     "@typescript-eslint/eslint-plugin": "^7.8.0",
     "@typescript-eslint/parser": "^7.8.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",
-    "nodemon": "^3.1.0",
+    "nodemon": "^3.1.1",
     "prettier": "^3.2.5",
     "prettier-plugin-prisma": "^5.0.0",
-    "prisma": "^5.13.0",
+    "prisma": "^5.14.0",
     "typescript": "^5.4.5"
   },
-  "packageManager": "yarn@4.2.1"
+  "packageManager": "yarn@4.2.2"
 }
