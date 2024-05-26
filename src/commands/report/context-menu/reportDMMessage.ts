@@ -31,11 +31,6 @@ export class ReportDMMessageContextMenuCommand extends Command {
   }
 
   public override async contextMenuRun(interaction: MessageContextMenuCommandInteraction<"cached">) {
-    // console.log(interaction.command);
-    // console.log(interaction);
-    // console.log(interaction.targetMessage);
-    // return;
-
     let message = interaction.targetMessage;
     if (message.partial) message = await message.fetch();
 

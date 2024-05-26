@@ -6,7 +6,7 @@ import { EmbedBuilder } from "discord.js";
 import colours from "../../constants/colours.js";
 import { env } from "../../index.js";
 
-export class RestartCommand extends Command {
+export class RestartChatInputCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,

@@ -3,7 +3,7 @@ import { EmbedBuilder } from "discord.js";
 
 import colours from "../../constants/colours.js";
 
-export class PingCommand extends Command {
+export class PingChatInputCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,

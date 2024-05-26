@@ -7,7 +7,7 @@ import emojis from "../../constants/emojis.js";
 import { findOrCreateUser } from "../../functions/findOrCreateUser.js";
 import { prisma } from "../../index.js";
 
-export class VoteCommand extends Command {
+export class VoteChatInputCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,

@@ -5,7 +5,7 @@ import { basicAdsRow } from "../../constants/advertisements.js";
 import colours from "../../constants/colours.js";
 import { prisma } from "../../index.js";
 
-export class InviteCommand extends Command {
+export class HelpChatInputCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
