@@ -1,5 +1,5 @@
 import { Events, Listener } from "@sapphire/framework";
-import { AuditLogEvent, EmbedBuilder, GuildAuditLogsEntry, User } from "discord.js";
+import { AuditLogEvent, EmbedBuilder, Guild, GuildAuditLogsEntry, User } from "discord.js";
 
 import colours from "../../../constants/colours.js";
 import { handleMemberUpdate } from "../../../functions/tracking/handleMemberUpdate.js";
@@ -15,7 +15,7 @@ export class TrackingGuildAuditLogEntryCreateListener extends Listener {
     });
   }
 
-  public async run(entry: GuildAuditLogsEntry) {
+  public async run(entry: GuildAuditLogsEntry, guild: Guild) {
     if (![AuditLogEvent.MemberBanRemove, AuditLogEvent.MemberUpdate].includes(entry.action)) return;
 
     if (!(entry.target instanceof User)) {
@@ -23,7 +23,7 @@ export class TrackingGuildAuditLogEntryCreateListener extends Listener {
     }
 
     const trackers = await prisma.trackedContent.findMany({
-      where: { type: "User", contentId: entry.target.id },
+      where: { type: "User", contentId: entry.target.id, guildId: guild.id },
       include: { report: true },
     });
 

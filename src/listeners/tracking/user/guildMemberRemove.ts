@@ -19,7 +19,7 @@ export class TrackingGuildMemberRemoveListener extends Listener {
     if (await member.fetch().catch(() => undefined)) return;
 
     const trackers = await prisma.trackedContent.findMany({
-      where: { type: "User", contentId: member.id },
+      where: { type: "User", contentId: member.id, guildId: member.guild.id },
       include: { report: true },
     });
 

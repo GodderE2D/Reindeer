@@ -14,10 +14,10 @@ export class TrackingMessageUpdateListener extends Listener {
     });
   }
   public async run(oldMessage: Message, newMessage: Message) {
-    if (!newMessage.member) return;
+    if (!newMessage.inGuild()) return;
 
     const trackers = await prisma.trackedContent.findMany({
-      where: { type: "Message", contentId: newMessage.id },
+      where: { type: "Message", contentId: newMessage.id, guildId: newMessage.guild.id },
       include: { report: true },
     });
 

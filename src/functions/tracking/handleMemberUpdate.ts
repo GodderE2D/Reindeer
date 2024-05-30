@@ -12,7 +12,7 @@ export async function handleMemberUpdate(tracker: TrackedContent & { report: Rep
       const embed = new EmbedBuilder()
         .setColor(colours.fuchsia)
         .setDescription(
-          `Tracked user <@${entry.target}> had their nickname ${change.new ? "changed" : "reset"}${
+          `Tracked user ${entry.target} had their nickname ${change.new ? "changed" : "reset"}${
             change.old ? ` from \`${change.old}\`` : ""
           }${change.new ? ` to \`${change.new}\`` : ""} by ${
             entry.executorId !== entry.targetId ? `<@${entry.executorId}>` : "themselves"
