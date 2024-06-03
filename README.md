@@ -47,7 +47,7 @@ To locally install the bot yourself (e.g. if you want to contribute or self-host
 ## Prerequisites
 
 - Node.js 16.11.0 or later
-- Yarn classic (1.22.19)
+- Yarn berry (v4)
 - A Discord application and bot
 - A PostgreSQL database (to run one locally, see [here](https://www.postgresql.org/docs/current/tutorial-install.html))
 
