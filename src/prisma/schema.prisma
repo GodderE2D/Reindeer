@@ -107,7 +107,7 @@ model TrackedContent {
   id             String     @id @default(cuid())
   createdAt      DateTime   @default(now()) @map("created_at")
   type           ReportType
-  isOriginal     Boolean    @default(true) @map("is_original") // if it's the reported message that's being tracked
+  isOriginal     Boolean    @default(true) @map("is_original") // if it's the reported message that's being tracked - unused
   notificationId String?    @map("reply_id") // message id for the notification message in the report thread
 
   contentId String  @map("content_id") // message or user id

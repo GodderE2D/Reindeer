@@ -1,8 +1,8 @@
 import { isGuildMember } from "@sapphire/discord.js-utilities";
 import { Events, Listener } from "@sapphire/framework";
-import { EmbedBuilder, Interaction, PermissionFlagsBits } from "discord.js";
+import { EmbedBuilder, Interaction, messageLink, PermissionFlagsBits } from "discord.js";
 
-import { prisma } from "../../index.js";
+import { prisma, trackedMessagesCache, trackedUsersCache } from "../../index.js";
 
 export class DeleteTrackerListener extends Listener {
   public constructor(context: Listener.LoaderContext, options: Listener.Options) {
@@ -35,6 +35,9 @@ export class DeleteTrackerListener extends Listener {
       });
     }
 
+    if (tracker.type === "User") trackedUsersCache.delete(tracker.contentId);
+    else trackedMessagesCache.delete(tracker.contentId);
+
     await prisma.trackedContent.delete({ where: { id: trackerId } });
 
     const embed = EmbedBuilder.from(interaction.message.embeds[0]);
@@ -55,6 +58,24 @@ export class DeleteTrackerListener extends Listener {
       embeds: [embed],
       components: [actionRow],
     });
+
+    const target = tracker.type === "User" ? await interaction.client.users.fetch(tracker.contentId) : null;
+
+    const deletionEmbed = new EmbedBuilder()
+      .setAuthor({
+        name: `${interaction.user.tag} (${interaction.user.id})`,
+        iconURL: interaction.user.displayAvatarURL({ forceStatic: true }),
+      })
+      .setDescription(
+        `${interaction.user} deleted a ${tracker.type === "Message" ? "message" : "user"} tracker for ${
+          tracker.type === "Message"
+            ? `${messageLink(tracker.channelId ?? "", tracker.contentId, tracker.guildId)}`
+            : `<@${tracker.contentId}> (\`${target?.tag}\`)`
+        }.`,
+      );
+
+    if (interaction.channel?.isTextBased()) await interaction.channel.send({ embeds: [deletionEmbed] });
+
     return await interaction.deferUpdate();
   }
 }

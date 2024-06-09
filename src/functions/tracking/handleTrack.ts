@@ -38,7 +38,7 @@ export async function handleTracking(
     },
   });
 
-  if (existingTrackedUser) {
+  if (!message && existingTrackedUser) {
     return interaction.editReply(`${target} is already being tracked for report #${number}.`);
   }
 
@@ -53,7 +53,7 @@ export async function handleTracking(
     }));
 
   if (existingTrackedMessage) {
-    return interaction.editReply(`[This message](${message.url}) is already being tracked for report #${number}.`);
+    return interaction.editReply(`${message.url} is already being tracked for report #${number}.`);
   }
 
   const trackedContentCount = await prisma.trackedContent.count({ where: { reportId: report.id } });
@@ -113,7 +113,7 @@ export async function handleTracking(
       iconURL: interaction.user.displayAvatarURL({ forceStatic: true }),
     })
     .setDescription(
-      `${interaction.user} has begun tracking [this message](${message?.url}) by ${target} (\`${message?.author.tag}\`).`,
+      `${interaction.user} has begun tracking ${message?.url} by ${target} (\`${message?.author.tag}\`).`,
     );
 
   const userEmbed = new EmbedBuilder()

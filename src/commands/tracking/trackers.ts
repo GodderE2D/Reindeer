@@ -14,7 +14,7 @@ import { messageLink } from "discord.js";
 
 import colours from "../../constants/colours.js";
 import { disableComponents } from "../../functions/disableComponents.js";
-import { prisma } from "../../index.js";
+import { prisma, trackedMessagesCache, trackedUsersCache } from "../../index.js";
 
 export class TrackerChatInputCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -146,29 +146,27 @@ export class TrackerChatInputCommand extends Command {
             const thisTracker = trackers.find((t) => t.id === id);
             if (!thisTracker) return;
 
+            if (thisTracker.type === "User") trackedUsersCache.delete(thisTracker.contentId);
+            else if (thisTracker.type === "Message") trackedMessagesCache.delete(thisTracker.contentId);
+
             const target =
               thisTracker.type === "User" ? await interaction.client.users.fetch(thisTracker.contentId) : null;
 
-            if (!thisTracker?.notificationId || !thisTracker.creatorId) {
-              const embed = new EmbedBuilder()
-                .setAuthor({
-                  name: `${interaction.user.tag} (${interaction.user.id})`,
-                  iconURL: interaction.user.displayAvatarURL({ forceStatic: true }),
-                })
-                .setDescription(
-                  `${interaction.user} deleted a ${thisTracker.type === "Message" ? "message" : "user"} tracker for ${
-                    thisTracker.type === "Message"
-                      ? `[this message](${messageLink(
-                          thisTracker.channelId ?? "",
-                          thisTracker.contentId,
-                          thisTracker.guildId,
-                        )})`
-                      : `<@${thisTracker.contentId}> (\`${target?.tag}\`)`
-                  }.`,
-                );
+            const embed = new EmbedBuilder()
+              .setAuthor({
+                name: `${interaction.user.tag} (${interaction.user.id})`,
+                iconURL: interaction.user.displayAvatarURL({ forceStatic: true }),
+              })
+              .setDescription(
+                `${interaction.user} deleted a ${thisTracker.type === "Message" ? "message" : "user"} tracker for ${
+                  thisTracker.type === "Message"
+                    ? `${messageLink(thisTracker.channelId ?? "", thisTracker.contentId, thisTracker.guildId)}`
+                    : `<@${thisTracker.contentId}> (\`${target?.tag}\`)`
+                }.`,
+              );
 
-              return reportThread.send({ embeds: [embed] });
-            }
+            await reportThread.send({ embeds: [embed] });
+            if (!thisTracker.notificationId || !thisTracker.creatorId) return;
 
             const creator = await interaction.client.users.fetch(thisTracker.creatorId);
             const author = thisTracker.authorId ? await interaction.client.users.fetch(thisTracker.authorId) : null;
@@ -181,11 +179,11 @@ export class TrackerChatInputCommand extends Command {
               .setDescription(
                 [
                   `**Tracker deleted by ${interaction.user} (${interaction.user.tag})**`,
-                  `~~<@${thisTracker.creatorId}> has begun tracking [this message](${messageLink(
+                  `~~<@${thisTracker.creatorId}> has begun tracking ${messageLink(
                     thisTracker.channelId ?? "",
                     thisTracker.contentId,
                     thisTracker.guildId,
-                  )}) by <@${thisTracker.authorId}> (\`${author?.tag}\`).~~`,
+                  )} by <@${thisTracker.authorId}> (\`${author?.tag}\`).~~`,
                 ].join("\n"),
               );
 

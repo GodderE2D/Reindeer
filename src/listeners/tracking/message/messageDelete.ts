@@ -3,7 +3,7 @@ import { EmbedBuilder, Message } from "discord.js";
 
 import colours from "../../../constants/colours.js";
 import { sendTrackingLog } from "../../../functions/tracking/sendTrackingLog.js";
-import { prisma } from "../../../index.js";
+import { prisma, trackedMessagesCache, trackedUsersCache } from "../../../index.js";
 
 export class TrackingMessageDeleteListener extends Listener {
   public constructor(context: Listener.LoaderContext, options: Listener.Options) {
@@ -40,8 +40,12 @@ export class TrackingMessageDeleteListener extends Listener {
           message.attachments.filter((attachment) => attachment.contentType?.startsWith("image")).first()?.url ?? null,
         );
 
-      sendTrackingLog(tracker, embed, message.author);
-      prisma.trackedContent.delete({ where: { id: tracker.id } });
+      await sendTrackingLog(tracker, embed, message.author);
+
+      if (tracker.type === "User") trackedUsersCache.delete(tracker.contentId);
+      else trackedMessagesCache.delete(tracker.contentId);
+
+      await prisma.trackedContent.delete({ where: { id: tracker.id } });
     }
   }
 }

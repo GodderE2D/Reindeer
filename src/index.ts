@@ -22,6 +22,7 @@ import { fetchBotBlacklist } from "./functions/botBlacklistCache.js";
 import envVarCheck from "./functions/envCheck.js";
 import { cacheStats, registerMetrics } from "./functions/registerMetrics.js";
 import { runVoteReminder } from "./functions/runVoteReminder.js";
+import { fetchTrackedContent } from "./functions/trackedContentCache.js";
 import Logger from "./logger.js";
 import * as routes from "./routes.js";
 
@@ -78,6 +79,12 @@ if (env.NODE_ENV === "production" && env.TOPGG_TOKEN?.length) {
 // Create collections
 export const commandsRan = new Collection<Snowflake, { createdAt: Date; name: string }>();
 export const memberCache = new Collection<Snowflake, Snowflake[]>();
+
+// Tracked content cache
+export const trackedUsersCache = new Set<Snowflake>();
+export const trackedMessagesCache = new Set<Snowflake>();
+fetchTrackedContent(trackedUsersCache, trackedMessagesCache);
+setInterval(() => fetchTrackedContent(trackedUsersCache, trackedMessagesCache), 30_000); // Fallback in case of a change outside of the process
 
 // Bot blacklist cache
 export const botBlacklistCache = new Set<string>();

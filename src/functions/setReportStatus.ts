@@ -10,7 +10,7 @@ import {
 
 import { basicAdsRow } from "../constants/advertisements.js";
 import colours from "../constants/colours.js";
-import { prisma } from "../index.js";
+import { prisma, trackedMessagesCache, trackedUsersCache } from "../index.js";
 import { sendFeedback } from "./sendFeedback.js";
 
 export async function setReportStatus(
@@ -126,7 +126,19 @@ export async function setReportStatus(
   await thread.setArchived(status !== "Open");
 
   report = await prisma.report.update({ where: { id: report.id }, data: { status }, include: { guild: true } });
-  if (status !== "Open") await prisma.trackedContent.deleteMany({ where: { reportId: report.id } });
+  if (status !== "Open") {
+    const trackedContent = await prisma.trackedContent.findMany({
+      where: { reportId: report.id },
+      select: { type: true, contentId: true },
+    });
+
+    for (const { type, contentId } of trackedContent) {
+      if (type === "User") trackedUsersCache.delete(contentId);
+      else trackedMessagesCache.delete(contentId);
+    }
+
+    await prisma.trackedContent.deleteMany({ where: { reportId: report.id } });
+  }
 
   if (status !== "Open" && report.guild.authorFeedbackEnabled && report.guild.authorFeedbackAutoSend) {
     const author = await interaction.client.users.fetch(report.authorId).catch(() => undefined);
