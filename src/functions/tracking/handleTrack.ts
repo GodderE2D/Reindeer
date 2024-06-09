@@ -147,7 +147,7 @@ export async function handleTracking(
   }
 
   let trackedMessage = "";
-  if (message) trackedMessage = `[this message](${message.url})`;
+  if (message) trackedMessage = `${message.url}`;
   if (trackAuthor && !existingTrackedUser) trackedMessage += " and ";
   if (!message || (trackAuthor && !existingTrackedUser)) trackedMessage += `${target}`;
 
