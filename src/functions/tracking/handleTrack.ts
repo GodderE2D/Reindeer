@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 
 import colours from "../../constants/colours.js";
-import { prisma } from "../../index.js";
+import { prisma, trackedMessagesCache, trackedUsersCache } from "../../index.js";
 
 export async function handleTracking(
   interaction: ChatInputCommandInteraction<"cached">,
@@ -133,11 +133,17 @@ export async function handleTracking(
   if (message) {
     const { id } = await thread.send({ embeds: [messageEmbed], components: [createRow(messageTrackedContent?.id)] });
     await prisma.trackedContent.update({ where: { id: messageTrackedContent?.id }, data: { notificationId: id } });
+
+    trackedMessagesCache.add(message.id);
+    message.fetch();
   }
 
   if (!message || (trackAuthor && !existingTrackedUser)) {
     const { id } = await thread.send({ embeds: [userEmbed], components: [createRow(userTrackedContent?.id)] });
     await prisma.trackedContent.update({ where: { id: userTrackedContent?.id }, data: { notificationId: id } });
+
+    trackedUsersCache.add(target.id);
+    target.fetch();
   }
 
   let trackedMessage = "";
