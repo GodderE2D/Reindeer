@@ -18,7 +18,7 @@ export const makeCache = Options.cacheWithLimits({
   VoiceStateManager: 0,
   MessageManager: {
     maxSize: 0,
-    keepOverLimit: (message) => message.author.id === message.client.user.id || trackedMessagesCache.has(message.id),
+    keepOverLimit: (message) => message.author?.id === message.client.user.id || trackedMessagesCache.has(message.id),
   },
   UserManager: {
     maxSize: 0,
