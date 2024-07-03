@@ -47,7 +47,7 @@
     "@sapphire/utilities": "^3.16.2",
     "@sentry/node": "^7.116.0",
     "dayjs": "^1.11.11",
-    "discord.js": "^14.15.3",
+    "discord.js": "14.14.1",
     "dotenv": "^16.4.5",
     "fastify": "^4.27.0",
     "ms": "^2.1.3",

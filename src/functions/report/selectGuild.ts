@@ -146,29 +146,29 @@ export async function selectGuild(
         const guild = interaction.client.guilds.cache.get(guildId);
 
         if (!guild) {
-          return await modalInteraction.reply({
+          return void (await modalInteraction.reply({
             content:
               "The server ID you provided was invalid, the server wasn't found, the target isn't in the server, the server hasn't set up Reindeer yet, or the server disabled reports from DMs. Please try again.",
             ephemeral: true,
-          });
+          }));
         }
 
         const guildData = await prisma.guild.findUnique({ where: { guildId: guild.id } });
 
         if (!guildData?.dmReportsEnabled) {
-          return await modalInteraction.reply({
+          return void (await modalInteraction.reply({
             content:
               "The server ID you provided was invalid, that server wasn't found, the target isn't in the server, the server hasn't set up Reindeer yet, or the server disabled reports from DMs. Please try again.",
             ephemeral: true,
-          });
+          }));
         }
 
         if (!(await guild?.members.fetch(target.id).catch(() => undefined))) {
-          return await modalInteraction.reply({
+          return void (await modalInteraction.reply({
             content:
               "The server ID you provided was invalid, that server wasn't found, the target isn't in the server, the server hasn't set up Reindeer yet, or the server disabled reports from DMs. Please try again.",
             ephemeral: true,
-          });
+          }));
         }
 
         await modalInteraction.deferUpdate();
@@ -185,29 +185,29 @@ export async function selectGuild(
         const guild = interaction.client.guilds.cache.get(guildId);
 
         if (!guild) {
-          return await i.reply({
+          return void (await i.reply({
             content:
               "The server you selected was invalid, that server wasn't found, the target isn't in the server, the server hasn't set up Reindeer yet, or the server disabled reports from DMs. Please try again.",
             ephemeral: true,
-          });
+          }));
         }
 
         const guildData = await prisma.guild.findUnique({ where: { guildId: guild.id } });
 
         if (!guildData?.dmReportsEnabled) {
-          return await i.reply({
+          return void (await i.reply({
             content:
               "The server you selected was invalid, that server wasn't found, the target isn't in the server, the server hasn't set up Reindeer yet, or the server disabled reports from DMs. Please try again.",
             ephemeral: true,
-          });
+          }));
         }
 
         if (!(await guild?.members.fetch(target.id))) {
-          return await i.reply({
+          return void (await i.reply({
             content:
               "The server ID you provided was invalid, that server wasn't found, the target isn't in the server, the server hasn't set up Reindeer yet, or the server disabled reports from DMs. Please try again.",
             ephemeral: true,
-          });
+          }));
         }
 
         await i.update({ embeds: [generateConfirmEmbed(guild)], components: [menuRow, createButtonRow(true)] });
