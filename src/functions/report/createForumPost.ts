@@ -67,7 +67,7 @@ export async function createForumPost(
   forumEmbed.addFields(
     guildData.fieldNames.map((fieldName, index) => ({
       name: `${index + 1}. ${fieldName}`,
-      value: modalResponse.fields.fields.at(index)?.value || "*No response.*",
+      value: modalResponse.fields.getTextInputValue(`report_modal_field_${index}`) || "*No response.*",
     })),
   );
 
@@ -119,7 +119,12 @@ export async function createForumPost(
   const firstMessage = (await forumPost.messages.fetch({ limit: 1 })).first();
   if (!firstMessage) return { number };
 
-  await firstMessage?.pin();
+  try {
+    await firstMessage?.pin();
+  } catch (error) {
+    // bot probably doesn't have the new Pin Messages permission
+    // ignore for now
+  }
 
   return {
     forumPost,

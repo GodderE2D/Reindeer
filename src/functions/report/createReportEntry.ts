@@ -38,7 +38,7 @@ export async function createReportEntry(
       startMessageId: firstMessageId,
       messageId: message?.id,
       channelId: message?.channel?.id,
-      fieldValues: modalResponse.fields.fields.map((f) => f.value),
+      fieldValues: modalResponse.fields.fields.map((_, customId) => modalResponse.fields.getTextInputValue(customId)),
       trackedContent: { createMany: { data: trackedContent } },
       guild: { connect: { guildId } },
       author: {

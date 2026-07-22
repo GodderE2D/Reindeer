@@ -1,6 +1,6 @@
 import { isGuildMember } from "@sapphire/discord.js-utilities";
 import { Events, Listener } from "@sapphire/framework";
-import { EmbedBuilder, Interaction, messageLink, PermissionFlagsBits } from "discord.js";
+import { ComponentType, EmbedBuilder, Interaction, messageLink, PermissionFlagsBits } from "discord.js";
 
 import { prisma, trackedMessagesCache, trackedUsersCache } from "../../index.js";
 
@@ -52,6 +52,9 @@ export class DeleteTrackerListener extends Listener {
 
     // Btw this is really dumb, TS doesn't like ActionRowBuilder.from()
     const actionRow = interaction.message.components[0].toJSON();
+    if (actionRow.type !== ComponentType.ActionRow || actionRow.components[0]?.type !== ComponentType.Button) {
+      throw new Error("Tracker message is missing its delete button.");
+    }
     actionRow.components[0].disabled = true;
 
     interaction.message.edit({
@@ -74,7 +77,7 @@ export class DeleteTrackerListener extends Listener {
         }.`,
       );
 
-    if (interaction.channel?.isTextBased()) await interaction.channel.send({ embeds: [deletionEmbed] });
+    if (interaction.channel?.isSendable()) await interaction.channel.send({ embeds: [deletionEmbed] });
 
     return await interaction.deferUpdate();
   }

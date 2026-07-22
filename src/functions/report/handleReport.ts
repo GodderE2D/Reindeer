@@ -22,9 +22,7 @@ export async function handleReport(
   author: User,
   target: User,
   interaction:
-    | ChatInputCommandInteraction<"cached">
-    | ContextMenuCommandInteraction<"cached">
-    | ButtonInteraction<"cached">,
+    ChatInputCommandInteraction<"cached"> | ContextMenuCommandInteraction<"cached"> | ButtonInteraction<"cached">,
   message?: Message,
   dmReport = false,
 ) {

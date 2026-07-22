@@ -26,7 +26,7 @@ export async function handleCommandError(error: Error, interaction: CommandInter
       .addFields(
         {
           name: "Command",
-          value: `\`${interaction}\``,
+          value: `\`${interaction.commandName}\``,
         },
         {
           name: "User",
@@ -50,8 +50,8 @@ export async function handleCommandError(error: Error, interaction: CommandInter
 
     const internalChannel = interaction.client.channels.cache.get(env.ERROR_LOGS_CHANNEL_ID);
 
-    if (!internalChannel?.isTextBased()) {
-      throw new Error("Fetched channel is not a text-based channel or is undefined.");
+    if (!internalChannel?.isSendable()) {
+      throw new Error("Fetched channel is not a sendable channel or is undefined.");
     }
 
     await internalChannel.send({ embeds: [logEmbed] });
